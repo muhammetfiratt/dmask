@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 Romantik Sürpriz 💕</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&callback=initMap" async defer></script>
+    <!-- Google Maps API Key: AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg -->
+</head>
+<body>
+    <div class="container">
+        <!-- Üst Yönetici Butonu -->
+        <div class="admin-button-container">
+            <button id="admin-settings-btn" class="btn btn-secondary btn-small">
+                <i class="fas fa-cog"></i> Yönetici Girişi
+            </button>
+        </div>
+
+        <!-- Ayarlar Sayfası -->
+        <div id="settings-page" class="page">
+            <div class="page-content">
+                <div class="header">
+                    <h1><i class="fas fa-heart"></i> Romantik Sürpriz</h1>
+                    <p>Özel anınız için ayarları yapın</p>
+                    <div id="platform-info" class="platform-info">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span id="platform-text">Platform tespit ediliyor...</span>
+                    </div>
+                </div>
+                
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="location-input">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Hedef Konum
+                        </label>
+                        <input type="text" id="location-input" placeholder="Örn: Gebze, Kocaeli veya Köşklüçeşme Mahallesi, Gebze">
+                        <div class="location-options">
+                            <button type="button" id="coordinate-toggle" class="btn-small">
+                                <i class="fas fa-crosshairs"></i> Koordinat Gir
+                            </button>
+                            <button type="button" id="current-location-btn" class="btn-small">
+                                <i class="fas fa-location-arrow"></i> Mevcut Konum
+                            </button>
+                        </div>
+                        <div id="coordinate-inputs" class="coordinate-inputs" style="display: none;">
+                            <div class="coordinate-row">
+                                <input type="number" id="latitude-input" placeholder="Enlem (Latitude)" step="0.000001" min="-90" max="90">
+                                <input type="number" id="longitude-input" placeholder="Boylam (Longitude)" step="0.000001" min="-180" max="180">
+                            </div>
+                            <button type="button" id="use-coordinates" class="btn-small">
+                                <i class="fas fa-check"></i> Bu Koordinatları Kullan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="video-input">
+                            <i class="fas fa-video"></i> Video Dosyası
+                        </label>
+                        <div class="video-upload-area" id="video-upload-area">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Video dosyasını buraya sürükleyin veya tıklayın</p>
+                                <small>MP4, AVI, MOV desteklenir (Maks. 100MB)</small>
+                            </div>
+                            <input type="file" id="video-input" accept="video/*" class="file-input">
+                        </div>
+                        <div class="video-info" id="video-info">
+                            <i class="fas fa-info-circle"></i>
+                            <small>Video dosyası seçin (MP4 önerilir)</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="custom-password">
+                            <i class="fas fa-lock"></i> Özel Şifre
+                        </label>
+                        <input type="password" id="custom-password" placeholder="Bildiğiniz şifre">
+                    </div>
+                    
+
+                    
+                    <button id="start-journey-btn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Yolculuğa Başla
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aşama 1: Konum Gösterimi -->
+        <div id="stage1-page" class="page active">
+            <div class="page-content">
+                <div class="stage-header">
+                    <div class="stage-number">1</div>
+                    <h2>Konum Kontrolü</h2>
+                    <p>Belirlenen konuma gidin</p>
+                </div>
+                
+                <div id="location-display" class="location-display" style="display: none;">
+                    <div class="location-card">
+                        <i class="fas fa-map-marker-alt location-icon"></i>
+                        <h3>Hedef Konum</h3>
+                        <p id="target-location-display">Konum yükleniyor...</p>
+                                                 <div class="distance-info">
+                             <i class="fas fa-ruler"></i>
+                             <span id="current-distance">Mesafe hesaplanıyor...</span>
+                             <div class="navigation-actions" id="navigation-actions" style="display: none;">
+                                 <button id="open-google-maps" class="btn btn-small btn-navigation">
+                                     <i class="fab fa-google"></i> Google Maps
+                                 </button>
+                                 <button id="open-apple-maps" class="btn btn-small btn-navigation">
+                                     <i class="fas fa-map"></i> Apple Maps
+                                 </button>
+                                 <button id="copy-coordinates" class="btn btn-small btn-navigation">
+                                     <i class="fas fa-copy"></i> Koordinatları Kopyala
+                                 </button>
+                             </div>
+                         </div>
+                    </div>
+                    
+                    <div class="map-container">
+                        <div id="map" class="map-placeholder">
+                            <i class="fas fa-map"></i>
+                            <p>Harita yükleniyor...</p>
+                        </div>
+                        <div id="map-loading" class="map-loading">
+                            <div class="spinner"></div>
+                            <p>Harita yükleniyor...</p>
+                        </div>
+                        <div id="map-error" class="map-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Harita yükleniyor... Alternatif yöntemler deneniyor</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="no-data-message" class="no-data-message">
+                    <div class="no-data-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Henüz Yolculuk Ayarları Yapılmamış</h3>
+                    <p>Konum ve video bilgileri henüz girilmemiş. Yönetici ayarlarından yolculuğu başlatabilirsiniz.</p>
+                    <button id="go-to-admin-btn" class="btn btn-primary">
+                        <i class="fas fa-cog"></i> Yönetici Girişi
+                    </button>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button id="back-to-settings" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </button>
+                    <button id="check-location-btn" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Konumda Olduğumu Kontrol Et
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aşama 2: Konum Doğrulama -->
+        <div id="stage2-page" class="page">
+            <div class="page-content">
+                <div class="stage-header">
+                    <div class="stage-number">2</div>
+                    <h2>Konum Doğrulama</h2>
+                    <p>Konumunuz kontrol ediliyor...</p>
+                </div>
+                
+                <div class="verification-container">
+                    <div class="loading-spinner" id="verification-spinner">
+                        <div class="spinner"></div>
+                        <p>Konum kontrol ediliyor...</p>
+                    </div>
+                    
+                    <div class="verification-result" id="verification-result" style="display: none;">
+                        <div class="result-icon">
+                            <i class="fas fa-check-circle success-icon"></i>
+                        </div>
+                        <h3>Konum Doğrulandı!</h3>
+                        <p>Hedef konumun 5 km yakınındasınız.</p>
+                        <div class="password-reveal">
+                            <h4>Aşama 3 Şifresi:</h4>
+                            <div class="password-box">
+                                <span id="stage3-password">****</span>
+                                <button id="copy-password" class="btn btn-small">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button id="back-to-stage1" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </button>
+                    <button id="proceed-to-stage3" class="btn btn-primary" style="display: none;">
+                        <i class="fas fa-arrow-right"></i> Aşama 3'e Geç
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aşama 3: Video Oynatma -->
+        <div id="stage3-page" class="page">
+            <div class="page-content">
+                <div class="stage-header">
+                    <div class="stage-number">3</div>
+                    <h2>Özel An</h2>
+                    <p>Şifreleri girerek romantik anı yaşayın</p>
+                </div>
+                
+                <div class="password-form">
+                    <div class="form-group">
+                        <label for="stage3-password-input">
+                            <i class="fas fa-key"></i> Aşama 3 Şifresi
+                        </label>
+                        <input type="password" id="stage3-password-input" placeholder="2. aşamada verilen şifre">
+                    </div>
+                    <div class="form-group">
+                        <label for="custom-password-input">
+                            <i class="fas fa-lock"></i> Özel Şifre
+                        </label>
+                        <input type="password" id="custom-password-input" placeholder="Bildiğiniz şifre">
+                    </div>
+                    
+                    <button id="unlock-video-btn" class="btn btn-primary">
+                        <i class="fas fa-unlock"></i> Videoyu Aç
+                    </button>
+                </div>
+                
+                <div class="video-container" id="video-container" style="display: none;">
+                    <video id="romantic-video" controls>
+                        <source id="video-source" src="" type="video/mp4">
+                        Tarayıcınız video oynatmayı desteklemiyor.
+                    </video>
+                    <div class="video-controls">
+                        <button id="send-arduino-signal" class="btn btn-success" style="display: none;">
+                            <i class="fas fa-bluetooth"></i> Arduino'ya Sinyal Gönder
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button id="back-to-stage2" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aşama 4: Romantik Mesaj -->
+        <div id="stage4-page" class="page">
+            <div class="page-content">
+                <div class="stage-header">
+                    <div class="stage-number">4</div>
+                    <h2>Romantik Sürpriz</h2>
+                    <p>Video sonrası özel an</p>
+                </div>
+                
+                <div class="romantic-final-message">
+                    <div class="romantic-heart-large">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h2>Hayatımın Aşkı</h2>
+                    <p class="romantic-text-final">
+                        Seninle geçirdiğim her an, hayatımın en değerli hazinesi. 
+                        Bugün, yeni bir başlangıç için özel bir an yaşadık.
+                    </p>
+                    <p class="romantic-text-final">
+                        <strong>Yeni hayatınıza bağlamak için özel şifreyi kutuya giriniz:</strong>
+                    </p>
+                    <div class="final-password-display">
+                        <h3>Özel Şifre:</h3>
+                        <div class="password-box-final">
+                            <span id="final-password-display">1995</span>
+                            <button id="copy-final-password-btn" class="btn btn-small">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="arduino-instructions-final">
+                        <h4>Arduino Keypad Talimatları:</h4>
+                        <ul>
+                            <li>4x4 Keypad'den <strong>1995</strong> şifresini girin</li>
+                            <li><strong>#</strong> tuşu ile onaylayın</li>
+                            <li><strong>*</strong> tuşu ile temizleyin</li>
+                            <li>Doğru şifre girildiğinde servo motor dönecek!</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button id="back-to-stage3" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="script.js"></script>
+</body>
+</html>

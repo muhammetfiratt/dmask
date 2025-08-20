@@ -1,0 +1,1574 @@
+/* Romantik Evlilik Teklifi Web Sitesi Stilleri */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff6b9d, #c44569, #f8b5d3);
+    min-height: 100vh;
+    color: #333;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Sayfa Geçişleri */
+.page {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sayfa İçeriği */
+.page-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Üst Yönetici Butonu */
+.admin-button-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Veri Yok Mesajı */
+.no-data-message {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #fff5f7, #ffeef2);
+    border-radius: 20px;
+    border: 2px solid #ffe0e6;
+    margin: 40px 0;
+}
+
+.no-data-icon {
+    margin-bottom: 20px;
+}
+
+.no-data-icon i {
+    font-size: 4rem;
+    color: #f39c12;
+}
+
+.no-data-message h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.no-data-message p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Başlık Stilleri */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3.5rem;
+    color: #e74c3c;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header p {
+    font-size: 1.2rem;
+    color: #666;
+    font-weight: 300;
+}
+
+/* Aşama Başlıkları */
+.stage-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.stage-number {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #e74c3c, #c44569);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+}
+
+.stage-header h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5rem;
+    color: #e74c3c;
+    margin-bottom: 10px;
+}
+
+.stage-header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+/* Form Stilleri */
+.settings-form, .password-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.form-group label i {
+    color: #e74c3c;
+    margin-right: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+/* Buton Stilleri */
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #e74c3c, #c44569);
+    color: white;
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(231, 76, 60, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: white;
+    box-shadow: 0 8px 20px rgba(149, 165, 166, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(149, 165, 166, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+#get-location-btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+#start-journey-btn {
+    width: 100%;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    padding: 18px;
+}
+
+/* Dosya Bilgisi */
+.file-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Video Bilgisi */
+.video-info {
+    margin-top: 10px;
+    padding: 15px;
+    background: linear-gradient(135deg, #d5f4e6, #e8f8f5);
+    border-radius: 8px;
+    border-left: 3px solid #27ae60;
+    font-size: 0.9rem;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Dosya Yükleme */
+.file-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.file-input:hover {
+    border-color: #e74c3c;
+    background: #fff5f5;
+}
+
+.file-input:focus {
+    outline: none;
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+
+
+/* Konum Yardım Metni */
+.location-help {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 8px;
+    border-left: 3px solid #2196f3;
+    font-size: 0.85rem;
+    color: #1976d2;
+}
+
+.location-help i {
+    margin-right: 6px;
+    color: #2196f3;
+}
+
+/* Konum Gösterimi */
+.location-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.location-card {
+    background: linear-gradient(135deg, #fff5f7, #ffeef2);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid #ffe0e6;
+}
+
+.location-icon {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 20px;
+}
+
+.location-card h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.location-card p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.distance-info {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e1e8ed;
+}
+
+.distance-info i {
+    color: #e74c3c;
+    margin-right: 8px;
+}
+
+/* Navigasyon Butonları */
+.navigation-actions {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-navigation {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-navigation:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-navigation i {
+    font-size: 0.9rem;
+}
+
+/* Responsive navigasyon butonları */
+@media (max-width: 480px) {
+    .navigation-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-navigation {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+}
+
+/* Harita Konteyner */
+.map-container {
+    background: #f8f9fa;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid #e1e8ed;
+}
+
+.map-placeholder {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background: white;
+}
+
+.map-placeholder i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #e74c3c;
+}
+
+/* Harita Yükleme Stilleri */
+.map-loading {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+}
+
+.map-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #e74c3c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.map-loading p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.map-error {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 2px solid #e74c3c;
+    backdrop-filter: blur(10px);
+}
+
+.map-error i {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 20px;
+}
+
+.map-error p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Basit Harita Stilleri */
+.simple-map {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.simple-map .map-info {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.simple-map .map-info h4 {
+    color: #e74c3c;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.simple-map .map-info p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 8px 0;
+}
+
+.simple-map .map-info small {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+}
+
+.simple-map .map-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.simple-map .map-actions .btn {
+    min-width: 140px;
+    font-size: 0.9rem;
+}
+
+/* Platform Uyumluluk Stilleri */
+@media (max-width: 768px) {
+    .simple-map .map-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .simple-map .map-actions .btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+/* Leaflet Harita Stilleri */
+.leaflet-container {
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.custom-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Doğrulama Konteyner */
+.verification-container {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.loading-spinner {
+    margin: 40px 0;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #e74c3c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.verification-result {
+    background: linear-gradient(135deg, #d5f4e6, #e8f8f5);
+    padding: 40px;
+    border-radius: 20px;
+    border: 2px solid #a8e6cf;
+}
+
+.result-icon {
+    margin-bottom: 20px;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #27ae60;
+}
+
+.verification-result h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: #27ae60;
+    margin-bottom: 15px;
+}
+
+.verification-result p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.password-reveal h4 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.password-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e1e8ed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.password-box span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+    letter-spacing: 2px;
+}
+
+/* Video Konteyner */
+.video-container {
+    margin: 40px 0;
+    text-align: center;
+}
+
+#romantic-video {
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.video-controls {
+    margin-top: 20px;
+}
+
+/* Navigasyon Butonları */
+.navigation-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* Modal Stilleri */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #e74c3c, #c44569);
+    color: white;
+    padding: 25px;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+}
+
+.close {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close:hover {
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 30px;
+    text-align: center;
+}
+
+.bluetooth-status {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border: 1px solid #e1e8ed;
+}
+
+.bluetooth-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.bluetooth-controls .btn {
+    min-width: 140px;
+}
+
+/* USB Bağlantı Butonu */
+#connect-serial {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#connect-serial:hover {
+    background: linear-gradient(135deg, #229954, #27ae60);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+}
+
+#connect-serial i {
+    margin-right: 8px;
+}
+
+/* Bağlantı Durumu Göstergeleri */
+.connection-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.server-status, .arduino-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.server-status {
+    background: #f8f9fa;
+    border: 1px solid #e1e8ed;
+}
+
+.server-status.connected {
+    background: #d5f4e6;
+    border-color: #27ae60;
+    color: #27ae60;
+}
+
+.server-status.disconnected {
+    background: #fff3cd;
+    border-color: #f39c12;
+    color: #f39c12;
+}
+
+.arduino-status {
+    background: #e3f2fd;
+    border: 1px solid #2196f3;
+    color: #2196f3;
+}
+
+.arduino-status i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Bağlantı Türüne Göre Renkler */
+.connection-usb {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+}
+
+.connection-bluetooth {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.connection-waiting {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+}
+
+/* Yönetici Veri Uyarısı - Kaldırıldı */
+
+/* Bluetooth Uyarısı */
+.bluetooth-warning {
+    margin: 20px 0;
+}
+
+.bluetooth-warning h4 {
+    color: #856404;
+    margin-bottom: 10px;
+}
+
+.bluetooth-warning p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .page-content {
+        padding: 20px;
+    }
+    
+    .header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .location-display {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .stage-header h2 {
+        font-size: 2rem;
+    }
+    
+    .page-content {
+        padding: 15px;
+    }
+}
+
+/* Özel Animasyonlar */
+.heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.3); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.3); }
+    70% { transform: scale(1); }
+}
+
+/* Romantik Efektler */
+.romantic-glow {
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+}
+
+.floating-hearts {
+    position: fixed;
+    pointer-events: none;
+    animation: float 6s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+        opacity: 0.8;
+    }
+    50% { 
+        transform: translateY(-20px) rotate(180deg); 
+        opacity: 1;
+    }
+}
+
+/* Romantik Mesaj Container */
+.romantic-message-container {
+    background: linear-gradient(135deg, #ff6b9d, #c44569);
+    border-radius: 20px;
+    padding: 40px;
+    margin: 30px 0;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(255, 107, 157, 0.3);
+    animation: fadeInUp 1s ease-out;
+}
+
+.romantic-content {
+    color: white;
+}
+
+.romantic-title {
+    margin-bottom: 30px;
+}
+
+.romantic-title i {
+    font-size: 4rem;
+    color: #ffeaa7;
+    margin-bottom: 20px;
+    display: block;
+    animation: heartbeat 2s infinite;
+}
+
+.romantic-title h2 {
+    font-size: 3rem;
+    font-family: 'Dancing Script', cursive;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.password-display {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+    backdrop-filter: blur(10px);
+}
+
+.password-display h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #ffeaa7;
+}
+
+.password-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+#final-password {
+    font-size: 2.5rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #ffeaa7;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 5px;
+}
+
+.arduino-instructions {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+    text-align: left;
+    backdrop-filter: blur(10px);
+}
+
+.arduino-instructions h4 {
+    color: #ffeaa7;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.arduino-instructions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.arduino-instructions li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 1.1rem;
+}
+
+.arduino-instructions li:last-child {
+    border-bottom: none;
+}
+
+.arduino-instructions strong {
+    color: #ffeaa7;
+    font-weight: bold;
+}
+
+.arduino-status {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.1rem;
+}
+
+.arduino-status i {
+    color: #ffeaa7;
+    font-size: 1.3rem;
+    animation: pulse 2s infinite;
+}
+
+/* Animasyonlar */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Romantik Giriş Mesajı Stilleri */
+.romantic-intro-message {
+    animation: fadeInUp 1s ease-out;
+    margin: 30px 0;
+}
+
+.romantic-intro-content {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.romantic-heart {
+    margin-bottom: 25px;
+}
+
+.romantic-heart i {
+    font-size: 4rem;
+    color: #e74c3c;
+    animation: heartbeat 2s infinite;
+    text-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+}
+
+.romantic-intro-content h2 {
+    color: #ffeaa7;
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.romantic-text {
+    color: #fff;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.romantic-text strong {
+    color: #ffeaa7;
+    font-weight: bold;
+}
+
+.system-password-display {
+    margin: 30px 0;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.system-password-display h3 {
+    color: #ffeaa7;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+}
+
+.password-box-large {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.password-box-large span {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #ffeaa7;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 8px;
+}
+
+.btn-large {
+    font-size: 1.3rem;
+    padding: 15px 30px;
+    margin-top: 25px;
+}
+
+.video-info {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.video-info i {
+    color: #27ae60;
+    font-size: 1.1rem;
+    margin-right: 10px;
+    animation: pulse 2s infinite;
+}
+
+/* 4. Aşama - Romantik Final Mesaj Stilleri */
+.romantic-final-message {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 50px;
+    backdrop-filter: blur(20px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    margin: 30px 0;
+}
+
+.romantic-heart-large {
+    margin-bottom: 30px;
+}
+
+.romantic-heart-large i {
+    font-size: 6rem;
+    color: #e74c3c;
+    animation: heartbeat 2s infinite;
+    text-shadow: 0 0 30px rgba(231, 76, 60, 0.6);
+}
+
+.romantic-final-message h2 {
+    color: #e74c3c;
+    font-size: 3rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-family: 'Dancing Script', cursive;
+}
+
+.romantic-text-final {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    line-height: 1.8;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+.romantic-text-final strong {
+    color: #098378;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+.final-password-display {
+    margin: 40px 0;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.final-password-display h3 {
+    color:#098378;
+    font-size: 1.6rem;
+    margin-bottom: 25px;
+}
+
+.password-box-final {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 30px;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+}
+
+.password-box-final span {
+    font-size: 4rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #7f3ce7;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    letter-spacing: 10px;
+}
+
+.arduino-instructions-final {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 40px 0;
+    text-align: left;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.arduino-instructions-final h4 {
+    color: #3c40e7;
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.arduino-instructions-final ul {
+    list-style: none;
+    padding: 0;
+}
+
+.arduino-instructions-final li {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 1.2rem;
+    color: #000000;
+}
+
+.arduino-instructions-final li:last-child {
+    border-bottom: none;
+}
+
+.arduino-instructions-final strong {
+    color: #6700a5;
+    font-weight: bold;
+}
+
+/* Sil butonu stili */
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border: 2px solid #c0392b;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+}
+
+/* Konum Doğrulama Detayları */
+.verification-details {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-item i {
+    color: #ffeaa7;
+    font-size: 1.1rem;
+    width: 20px;
+}
+
+.detail-item span {
+    font-size: 1rem;
+}
+
+/* Doğrulama Aksiyonları */
+.verification-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.verification-actions .btn {
+    min-width: 140px;
+}
+
+/* Hata Detayları */
+.error-details {
+    background: rgba(243, 156, 18, 0.1);
+    border: 1px solid rgba(243, 156, 18, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.error-details p {
+    color: #f39c12;
+    margin: 0;
+}
+
+/* Responsive Harita */
+@media (max-width: 768px) {
+    .verification-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .verification-actions .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .simple-map {
+        padding: 20px;
+    }
+}
+
+/* Platform Bilgi Kutusu */
+.platform-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.platform-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.platform-info i {
+    font-size: 1.1rem;
+}
+
+/* Platform'a göre renkler */
+.platform-info.android {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+
+.platform-info.ios {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+
+.platform-info.windows {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.platform-info.macos {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.platform-info.linux {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+/* Konum Seçenekleri */
+.location-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(108, 92, 231, 0.3);
+}
+
+.btn-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+}
+
+.btn-small.active {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+}
+
+/* Koordinat Girişi */
+.coordinate-inputs {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.coordinate-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.coordinate-row input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.coordinate-row input:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+}
+
+.coordinate-row input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.coordinate-row input::-webkit-outer-spin-button,
+.coordinate-row input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.coordinate-row input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Video Yükleme Alanı */
+.video-upload-area {
+    position: relative;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.video-upload-area:hover {
+    border-color: #6c5ce7;
+    background: rgba(108, 92, 231, 0.1);
+    transform: translateY(-2px);
+}
+
+.video-upload-area.dragover {
+    border-color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+    transform: scale(1.02);
+}
+
+.upload-placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.upload-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #6c5ce7;
+}
+
+.upload-placeholder p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.upload-placeholder small {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.video-upload-area .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Video Önizleme */
+.video-preview-container {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.video-preview-container video {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
