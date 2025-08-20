@@ -7,7 +7,15 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static('.', {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        } else if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+    }
+}));
 app.use('/data', express.static('data'));
 
 // Multer konfigürasyonu - Heroku uyumlu
