@@ -6,42 +6,27 @@
       "use": "@vercel/node"
     }
   ],
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
+    }
+  },
   "routes": [
     {
       "src": "/styles.css",
-      "dest": "/styles.css",
-      "headers": {
-        "Content-Type": "text/css"
-      }
+      "dest": "/api/static/styles.css"
     },
     {
       "src": "/script.js",
-      "dest": "/script.js",
-      "headers": {
-        "Content-Type": "application/javascript"
-      }
+      "dest": "/api/static/script.js"
     },
     {
       "src": "/index.html",
-      "dest": "/index.html",
-      "headers": {
-        "Content-Type": "text/html"
-      }
-    },
-    {
-      "src": "/data/(.*)",
-      "dest": "/data/$1"
-    },
-    {
-      "src": "/(.*\\.(css|js|html|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/$1"
+      "dest": "/api/static/index.html"
     },
     {
       "src": "/(.*)",
       "dest": "/server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
