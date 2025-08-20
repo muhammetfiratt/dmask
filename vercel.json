@@ -9,15 +9,32 @@
   "routes": [
     {
       "src": "/styles.css",
-      "dest": "/styles.css"
+      "dest": "/styles.css",
+      "headers": {
+        "Content-Type": "text/css"
+      }
     },
     {
       "src": "/script.js",
-      "dest": "/script.js"
+      "dest": "/script.js",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "src": "/index.html",
+      "dest": "/index.html",
+      "headers": {
+        "Content-Type": "text/html"
+      }
     },
     {
       "src": "/data/(.*)",
       "dest": "/data/$1"
+    },
+    {
+      "src": "/(.*\\.(css|js|html|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",

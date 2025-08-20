@@ -7,15 +7,27 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static('.', {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css');
-        } else if (path.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
-        }
-    }
-}));
+
+// CSS dosyaları için özel route
+app.get('/styles.css', (req, res) => {
+    res.setHeader('Content-Type', 'text/css');
+    res.sendFile(path.join(__dirname, 'styles.css'));
+});
+
+// JavaScript dosyaları için özel route
+app.get('/script.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.sendFile(path.join(__dirname, 'script.js'));
+});
+
+// HTML dosyaları için özel route
+app.get('/index.html', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Genel statik dosya servisi
+app.use(express.static('.'));
 app.use('/data', express.static('data'));
 
 // Multer konfigürasyonu - Heroku uyumlu
