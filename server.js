@@ -8,25 +8,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 
-// Statik dosyalar için API endpoint'leri
-app.get('/api/static/styles.css', (req, res) => {
-    res.setHeader('Content-Type', 'text/css');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-    res.sendFile(path.join(__dirname, 'styles.css'));
-});
-
-app.get('/api/static/script.js', (req, res) => {
-    res.setHeader('Content-Type', 'application/javascript');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-    res.sendFile(path.join(__dirname, 'script.js'));
-});
-
-app.get('/api/static/index.html', (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Genel statik dosya servisi
+// Basit statik dosya servisi
 app.use(express.static('.'));
 app.use('/data', express.static('data'));
 
