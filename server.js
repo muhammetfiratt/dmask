@@ -8,28 +8,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 
-// Statik dosya servisi - özel route'lar ile
-app.get('/styles.css', (req, res) => {
-    res.setHeader('Content-Type', 'text/css');
-    res.sendFile(path.join(__dirname, 'styles.css'));
-});
-
-app.get('/script.js', (req, res) => {
-    res.setHeader('Content-Type', 'application/javascript');
-    res.sendFile(path.join(__dirname, 'script.js'));
-});
-
-app.get('/favicon.ico', (req, res) => {
-    res.setHeader('Content-Type', 'image/x-icon');
-    res.sendFile(path.join(__dirname, 'favicon.ico'));
-});
-
-app.get('/favicon.png', (req, res) => {
-    res.setHeader('Content-Type', 'image/png');
-    res.sendFile(path.join(__dirname, 'favicon.png'));
-});
-
-// Genel statik dosya servisi
+// Basit statik dosya servisi
 app.use(express.static('.'));
 app.use('/data', express.static('data'));
 

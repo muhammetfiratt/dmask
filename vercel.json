@@ -16,12 +16,8 @@
       "dest": "/script.js"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/favicon.png",
-      "dest": "/favicon.png"
+      "src": "/index.html",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
