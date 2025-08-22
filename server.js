@@ -69,6 +69,13 @@ app.post('/delete-data', async (req, res) => {
     }
 });
 
+// Google Maps API Key endpoint'i
+app.get('/api/maps-key', (req, res) => {
+    // Environment variable'dan API key'i al
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE';
+    res.json({ apiKey: apiKey });
+});
+
 // Ana sayfa
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));

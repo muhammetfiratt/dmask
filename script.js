@@ -1,5 +1,25 @@
 // Romantik Evlilik Teklifi Web Sitesi JavaScript
 
+// Google Maps API Key'i güvenli bir şekilde yükle
+async function loadGoogleMapsAPI() {
+    try {
+        const response = await fetch('/api/maps-key');
+        const data = await response.json();
+        
+        // Mevcut script tag'ini güncelle
+        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+        if (existingScript) {
+            const newSrc = existingScript.src.replace('YOUR_GOOGLE_MAPS_API_KEY', data.apiKey);
+            existingScript.src = newSrc;
+        }
+    } catch (error) {
+        console.error('Google Maps API key yüklenemedi:', error);
+    }
+}
+
+// Sayfa yüklendiğinde API key'i yükle
+document.addEventListener('DOMContentLoaded', loadGoogleMapsAPI);
+
 class RomanticSurprise {
     constructor() {
         this.currentStage = 'stage1';

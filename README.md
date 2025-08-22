@@ -26,14 +26,43 @@ Bu proje, romantik bir evlilik teklifi için özel olarak tasarlanmış interakt
 
 1. **Projeyi klonlayın:**
    ```bash
-   git clone https://github.com/kullaniciadi/proje-adi.git
-   cd proje-adi
+   git clone https://github.com/muhammetfiratt/dmask.git
+   cd dmask
    ```
 
 2. **Bağımlılıkları yükleyin:**
    ```bash
    npm install
    ```
+
+3. **🔐 GÜVENLİK UYARISI - Google Maps API Key Kurulumu:**
+   
+   **ÖNEMLİ**: Bu proje Google Maps API kullanır. Güvenlik nedeniyle API key'i environment variable olarak ayarlamanız gerekir.
+   
+   a) Google Cloud Console'dan yeni bir API key alın:
+      - https://console.cloud.google.com/ adresine gidin
+      - "APIs & Services" > "Credentials" bölümüne gidin
+      - "CREATE CREDENTIALS" > "API key" seçin
+      - Yeni API key'i kopyalayın
+   
+   b) Environment variable olarak ayarlayın:
+      ```bash
+      # Windows (PowerShell)
+      $env:GOOGLE_MAPS_API_KEY="your_new_api_key_here"
+      
+      # Windows (CMD)
+      set GOOGLE_MAPS_API_KEY=your_new_api_key_here
+      
+      # macOS/Linux
+      export GOOGLE_MAPS_API_KEY="your_new_api_key_here"
+      ```
+   
+   c) Veya .env dosyası oluşturun:
+      ```bash
+      echo "GOOGLE_MAPS_API_KEY=your_new_api_key_here" > .env
+      ```
+   
+   **UYARI**: API key'inizi asla GitHub'a yüklemeyin! .env dosyası .gitignore'da olduğundan güvenlidir.
 
 3. **Projeyi çalıştırın:**
    ```bash
