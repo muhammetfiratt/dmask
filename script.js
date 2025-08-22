@@ -337,37 +337,48 @@ class RomanticSurprise {
 
     async loadStoredData() {
         try {
-            // GitHub Pages kontrolü
-            const isGitHubPages = window.location.hostname.includes('github.io');
+            // GitHub Pages veya statik hosting kontrolü
+            const isGitHubPages = window.location.hostname.includes('github.io') || 
+                                 !window.location.hostname.includes('localhost') ||
+                                 window.location.protocol === 'file:';
+            
+            console.log('🔍 Hosting ortamı:', isGitHubPages ? 'GitHub Pages/Statik' : 'Node.js Server');
             
             if (isGitHubPages) {
                 // GitHub Pages'de direkt config.json dosyasını oku
+                console.log('📁 Config.json dosyasından yükleniyor...');
                 await this.loadFromConfigFile();
             } else {
                 // Node.js server endpoint'ini dene
-                const response = await fetch('/load-data');
-                if (response.ok) {
-                    const data = await response.json();
-                    this.targetLocation = data.targetLocation;
-                    this.customPassword = data.customPassword;
-                    
-                    // Video dosyasını yükle
-                    if (data.videoFileName) {
-                        const videoResponse = await fetch(`/data/${data.videoFileName}`);
-                        if (videoResponse.ok) {
-                            const videoBlob = await videoResponse.blob();
-                            this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
+                console.log('🖥️ Server endpoint\'i deneniyor...');
+                try {
+                    const response = await fetch('/load-data');
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.targetLocation = data.targetLocation;
+                        this.customPassword = data.customPassword;
+                        
+                        // Video dosyasını yükle
+                        if (data.videoFileName) {
+                            const videoResponse = await fetch(`/data/${data.videoFileName}`);
+                            if (videoResponse.ok) {
+                                const videoBlob = await videoResponse.blob();
+                                this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
+                            }
                         }
+                        
+                        this.showNotification('Veriler dosya sisteminden yüklendi!', 'success');
+                    } else {
+                        throw new Error('Server endpoint bulunamadı');
                     }
-                    
-                    this.showNotification('Veriler dosya sisteminden yüklendi!', 'success');
-                } else {
-                    // Fallback olarak localStorage kullan
-                    this.loadFromLocalStorage();
+                } catch (serverError) {
+                    console.log('⚠️ Server endpoint başarısız, config.json deneniyor...');
+                    await this.loadFromConfigFile();
                 }
             }
         } catch (error) {
             console.error('Veri yükleme hatası:', error);
+            console.log('💾 LocalStorage fallback kullanılıyor...');
             this.loadFromLocalStorage();
         }
         
@@ -909,8 +920,8 @@ class RomanticSurprise {
             // Harita yüklendi
             mapLoading.style.display = 'none';
             mapContainer.style.background = 'none';
-            mapContainer.innerHTML = '';
-            mapContainer.appendChild(map.getDiv());
+            // mapContainer.innerHTML = ''; // Bu satırı kaldır
+            // mapContainer.appendChild(map.getDiv()); // Bu satır problemli, gerek yok
             
             // Harita referansını sakla
             this._currentMap = map;
