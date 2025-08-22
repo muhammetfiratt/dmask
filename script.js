@@ -3,13 +3,30 @@
 // Google Maps API Key'i güvenli bir şekilde yükle
 async function loadGoogleMapsAPI() {
     try {
-        const response = await fetch('/api/maps-key');
-        const data = await response.json();
+        // Önce server endpoint'ini dene (Node.js server için)
+        let apiKey = null;
+        
+        try {
+            const response = await fetch('/api/maps-key');
+            if (response.ok) {
+                const data = await response.json();
+                apiKey = data.apiKey;
+            }
+        } catch (serverError) {
+            console.log('Server endpoint mevcut değil, alternatif yöntem kullanılıyor...');
+        }
+        
+        // Eğer server endpoint çalışmıyorsa (GitHub Pages gibi), environment variable'ı kontrol et
+        if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
+            // GitHub Pages için geçici bir demo key kullan veya placeholder bırak
+            apiKey = 'demo_key_or_placeholder';
+            console.warn('⚠️ API key ayarlanmamış. Harita çalışmayabilir.');
+        }
         
         // Mevcut script tag'ini güncelle
         const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-        if (existingScript) {
-            const newSrc = existingScript.src.replace('YOUR_GOOGLE_MAPS_API_KEY', data.apiKey);
+        if (existingScript && apiKey !== 'demo_key_or_placeholder') {
+            const newSrc = existingScript.src.replace('YOUR_GOOGLE_MAPS_API_KEY', apiKey);
             existingScript.src = newSrc;
         }
     } catch (error) {
@@ -320,29 +337,37 @@ class RomanticSurprise {
 
     async loadStoredData() {
         try {
-            // Önce dosya sisteminden yüklemeyi dene
-            const response = await fetch('/load-data');
-            if (response.ok) {
-                const data = await response.json();
-                this.targetLocation = data.targetLocation;
-                this.customPassword = data.customPassword;
-                
-                // Video dosyasını yükle
-                if (data.videoFileName) {
-                    const videoResponse = await fetch(`/data/${data.videoFileName}`);
-                    if (videoResponse.ok) {
-                        const videoBlob = await videoResponse.blob();
-                        this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
-                    }
-                }
-                
-                this.showNotification('Veriler dosya sisteminden yüklendi!', 'success');
+            // GitHub Pages kontrolü
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            
+            if (isGitHubPages) {
+                // GitHub Pages'de direkt config.json dosyasını oku
+                await this.loadFromConfigFile();
             } else {
-                // Fallback olarak localStorage kullan
-                this.loadFromLocalStorage();
+                // Node.js server endpoint'ini dene
+                const response = await fetch('/load-data');
+                if (response.ok) {
+                    const data = await response.json();
+                    this.targetLocation = data.targetLocation;
+                    this.customPassword = data.customPassword;
+                    
+                    // Video dosyasını yükle
+                    if (data.videoFileName) {
+                        const videoResponse = await fetch(`/data/${data.videoFileName}`);
+                        if (videoResponse.ok) {
+                            const videoBlob = await videoResponse.blob();
+                            this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
+                        }
+                    }
+                    
+                    this.showNotification('Veriler dosya sisteminden yüklendi!', 'success');
+                } else {
+                    // Fallback olarak localStorage kullan
+                    this.loadFromLocalStorage();
+                }
             }
         } catch (error) {
-            console.error('Dosya sisteminden yükleme hatası:', error);
+            console.error('Veri yükleme hatası:', error);
             this.loadFromLocalStorage();
         }
         
@@ -351,6 +376,40 @@ class RomanticSurprise {
         
         // Yönetici veri kontrolü yap
         this.checkAdminData();
+    }
+
+    async loadFromConfigFile() {
+        try {
+            // GitHub Pages'de config.json dosyasını oku
+            const response = await fetch('./data/config.json');
+            if (response.ok) {
+                const data = await response.json();
+                this.targetLocation = data.targetLocation;
+                this.customPassword = data.customPassword;
+                
+                // Video dosyasını yükle
+                if (data.videoFileName) {
+                    try {
+                        const videoResponse = await fetch(`./data/${data.videoFileName}`);
+                        if (videoResponse.ok) {
+                            const videoBlob = await videoResponse.blob();
+                            this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
+                        }
+                    } catch (videoError) {
+                        console.warn('Video dosyası yüklenemedi:', videoError);
+                        // Video olmadan devam et
+                    }
+                }
+                
+                console.log('✅ Veriler config.json dosyasından yüklendi!');
+            } else {
+                throw new Error('Config.json dosyası bulunamadı');
+            }
+        } catch (error) {
+            console.error('Config dosyası yükleme hatası:', error);
+            // Fallback olarak localStorage kullan
+            this.loadFromLocalStorage();
+        }
     }
 
     loadFromLocalStorage() {
