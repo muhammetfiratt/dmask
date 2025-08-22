@@ -69,6 +69,3 @@ logs
 tmp/
 temp/
 
-# Data files (if you don't want to commit them)
-data/*.mp4
-data/config.json
