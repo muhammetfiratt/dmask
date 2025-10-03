@@ -88,7 +88,12 @@ class RomanticSurprise {
             
             // Video dosyasını IndexedDB'ye kaydet
             if (this.videoFile) {
-                await this.saveVideoToIndexedDB(this.videoFile);
+                try {
+                    await this.saveVideoToIndexedDB(this.videoFile);
+                } catch (error) {
+                    console.warn('Otomatik yedekleme video hatası:', error);
+                    // Video kaydedilemese bile diğer veriler kaydedilsin
+                }
             }
             
             // Yedekleme verisini localStorage'a kaydet
@@ -291,6 +296,16 @@ class RomanticSurprise {
                 importBtn.onclick = () => this.showImportDialog();
                 startBtn.parentNode.insertBefore(importBtn, startBtn.nextSibling);
             }
+            
+            // IndexedDB temizleme butonu ekle
+            if (!document.getElementById('clear-indexeddb-btn')) {
+                const clearBtn = document.createElement('button');
+                clearBtn.id = 'clear-indexeddb-btn';
+                clearBtn.className = 'btn btn-warning';
+                clearBtn.innerHTML = '<i class="fas fa-database"></i> IndexedDB Temizle';
+                clearBtn.onclick = () => this.clearIndexedDBManual();
+                startBtn.parentNode.insertBefore(clearBtn, startBtn.nextSibling);
+            }
         } else {
             startBtn.innerHTML = '<i class="fas fa-play"></i> Yolculuğa Başla';
             startBtn.onclick = () => this.startJourney();
@@ -299,9 +314,11 @@ class RomanticSurprise {
             const deleteBtn = document.getElementById('delete-data-btn');
             const exportBtn = document.getElementById('export-data-btn');
             const importBtn = document.getElementById('import-data-btn');
+            const clearBtn = document.getElementById('clear-indexeddb-btn');
             if (deleteBtn) deleteBtn.remove();
             if (exportBtn) exportBtn.remove();
             if (importBtn) importBtn.remove();
+            if (clearBtn) clearBtn.remove();
         }
     }
 
@@ -328,14 +345,12 @@ class RomanticSurprise {
                 // Server dosyalarını sil (varsa)
                 await this.deleteDataFiles();
                 
-                // IndexedDB'den video sil
-                if (videoFileName) {
-                    try {
-                        await this.deleteVideoFromIndexedDB(videoFileName);
-                        console.log('✅ Video IndexedDB\'den silindi');
-                    } catch (error) {
-                        console.warn('Video IndexedDB\'den silinemedi:', error);
-                    }
+                // IndexedDB'yi tamamen temizle
+                try {
+                    await this.clearIndexedDB();
+                    console.log('✅ IndexedDB tamamen temizlendi');
+                } catch (error) {
+                    console.warn('IndexedDB temizlenemedi:', error);
                 }
                 
                 // localStorage'ı temizle
@@ -613,8 +628,13 @@ class RomanticSurprise {
                 
                 // Video dosyasını IndexedDB'ye kaydet
                 if (this.videoFile) {
-                    await this.saveVideoToIndexedDB(this.videoFile);
-                    console.log('✅ Video IndexedDB\'ye kaydedildi');
+                    try {
+                        await this.saveVideoToIndexedDB(this.videoFile);
+                        console.log('✅ Video IndexedDB\'ye kaydedildi');
+                    } catch (videoError) {
+                        console.warn('Video IndexedDB\'ye kaydedilemedi:', videoError);
+                        // Video kaydedilemese bile diğer veriler localStorage'a kaydedilsin
+                    }
                 }
                 
                 // Diğer verileri localStorage'a kaydet
@@ -2415,29 +2435,52 @@ class RomanticSurprise {
             
             request.onerror = () => reject(request.error);
             
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('videos')) {
+                    db.createObjectStore('videos', { keyPath: 'fileName' });
+                    console.log('📁 IndexedDB videos store oluşturuldu');
+                }
+            };
+            
             request.onsuccess = (event) => {
                 const db = event.target.result;
                 
                 if (!db.objectStoreNames.contains('videos')) {
+                    console.log('⚠️ Videos store bulunamadı, null döndürülüyor');
                     resolve(null);
                     return;
                 }
                 
-                const transaction = db.transaction(['videos'], 'readonly');
-                const store = transaction.objectStore('videos');
-                const getRequest = store.get(fileName);
-                
-                getRequest.onsuccess = () => {
-                    const result = getRequest.result;
-                    if (result && result.blob) {
-                        console.log('Video IndexedDB\'den yüklendi:', fileName);
-                        resolve(result.blob);
-                    } else {
+                try {
+                    const transaction = db.transaction(['videos'], 'readonly');
+                    const store = transaction.objectStore('videos');
+                    const getRequest = store.get(fileName);
+                    
+                    getRequest.onsuccess = () => {
+                        const result = getRequest.result;
+                        if (result && result.blob) {
+                            console.log('✅ Video IndexedDB\'den yüklendi:', fileName);
+                            resolve(result.blob);
+                        } else {
+                            console.log('📁 Video bulunamadı:', fileName);
+                            resolve(null);
+                        }
+                    };
+                    
+                    getRequest.onerror = () => {
+                        console.warn('Video yükleme hatası:', getRequest.error);
                         resolve(null);
-                    }
-                };
-                
-                getRequest.onerror = () => reject(getRequest.error);
+                    };
+                    
+                    transaction.onerror = () => {
+                        console.warn('Transaction hatası:', transaction.error);
+                        resolve(null);
+                    };
+                } catch (error) {
+                    console.warn('IndexedDB transaction hatası:', error);
+                    resolve(null);
+                }
             };
         });
     }
@@ -2446,26 +2489,51 @@ class RomanticSurprise {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('RomanticSurpriseDB', 1);
             
-            request.onerror = () => reject(request.error);
+            request.onerror = () => {
+                console.warn('IndexedDB açma hatası:', request.error);
+                resolve(); // Hata olsa bile devam et
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('videos')) {
+                    db.createObjectStore('videos', { keyPath: 'fileName' });
+                    console.log('📁 IndexedDB videos store oluşturuldu (delete için)');
+                }
+            };
             
             request.onsuccess = (event) => {
                 const db = event.target.result;
                 
                 if (!db.objectStoreNames.contains('videos')) {
+                    console.log('⚠️ Videos store bulunamadı, silme işlemi atlanıyor');
                     resolve();
                     return;
                 }
                 
-                const transaction = db.transaction(['videos'], 'readwrite');
-                const store = transaction.objectStore('videos');
-                const deleteRequest = store.delete(fileName);
-                
-                deleteRequest.onsuccess = () => {
-                    console.log('Video IndexedDB\'den silindi:', fileName);
-                    resolve();
-                };
-                
-                deleteRequest.onerror = () => reject(deleteRequest.error);
+                try {
+                    const transaction = db.transaction(['videos'], 'readwrite');
+                    const store = transaction.objectStore('videos');
+                    const deleteRequest = store.delete(fileName);
+                    
+                    deleteRequest.onsuccess = () => {
+                        console.log('✅ Video IndexedDB\'den silindi:', fileName);
+                        resolve();
+                    };
+                    
+                    deleteRequest.onerror = () => {
+                        console.warn('Video silme hatası:', deleteRequest.error);
+                        resolve(); // Hata olsa bile devam et
+                    };
+                    
+                    transaction.onerror = () => {
+                        console.warn('Delete transaction hatası:', transaction.error);
+                        resolve(); // Hata olsa bile devam et
+                    };
+                } catch (error) {
+                    console.warn('IndexedDB delete hatası:', error);
+                    resolve(); // Hata olsa bile devam et
+                }
             };
         });
     }
@@ -2592,6 +2660,46 @@ class RomanticSurprise {
         }
         const byteArray = new Uint8Array(byteNumbers);
         return new Blob([byteArray], { type: mimeType });
+    }
+
+    // IndexedDB Temizleme Fonksiyonu
+    async clearIndexedDB() {
+        return new Promise((resolve) => {
+            try {
+                const deleteRequest = indexedDB.deleteDatabase('RomanticSurpriseDB');
+                
+                deleteRequest.onsuccess = () => {
+                    console.log('✅ IndexedDB tamamen temizlendi');
+                    resolve();
+                };
+                
+                deleteRequest.onerror = () => {
+                    console.warn('IndexedDB temizleme hatası:', deleteRequest.error);
+                    resolve(); // Hata olsa bile devam et
+                };
+                
+                deleteRequest.onblocked = () => {
+                    console.warn('IndexedDB temizleme engellendi, diğer sekmeler kapalı olmalı');
+                    resolve(); // Engellense bile devam et
+                };
+            } catch (error) {
+                console.warn('IndexedDB temizleme genel hatası:', error);
+                resolve(); // Hata olsa bile devam et
+            }
+        });
+    }
+
+    // Manuel IndexedDB Temizleme
+    async clearIndexedDBManual() {
+        if (confirm('IndexedDB\'yi temizlemek istediğinizden emin misiniz?\n\nBu işlem tüm video dosyalarını silecek.')) {
+            try {
+                this.showNotification('IndexedDB temizleniyor...', 'info');
+                await this.clearIndexedDB();
+                this.showNotification('IndexedDB başarıyla temizlendi! 🗑️', 'success');
+            } catch (error) {
+                this.showNotification('IndexedDB temizleme hatası: ' + error.message, 'error');
+            }
+        }
     }
 }
 
