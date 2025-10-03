@@ -3,34 +3,34 @@
 // Google Maps API Key'i güvenli bir şekilde yükle
 async function loadGoogleMapsAPI() {
     try {
-        // Önce server endpoint'ini dene (Node.js server için)
         let apiKey = null;
         
+        // Önce server endpoint'ini dene (Node.js server için)
         try {
             const response = await fetch('/api/maps-key');
             if (response.ok) {
                 const data = await response.json();
                 apiKey = data.apiKey;
+                console.log('🗺️ Google Maps API key server\'dan alındı');
             }
         } catch (serverError) {
-            console.log('Server endpoint mevcut değil, alternatif yöntem kullanılıyor...');
+            console.log('🔍 Server endpoint mevcut değil, alternatif yöntem kullanılıyor...');
         }
         
-        // Eğer server endpoint çalışmıyorsa (GitHub Pages gibi), environment variable'ı kontrol et
-        if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
-            // GitHub Pages için geçici bir demo key kullan veya placeholder bırak
-            apiKey = 'demo_key_or_placeholder';
-            console.warn('⚠️ API key ayarlanmamış. Harita çalışmayabilir.');
-        }
-        
-        // Mevcut script tag'ini güncelle
-        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-        if (existingScript && apiKey !== 'demo_key_or_placeholder') {
-            const newSrc = existingScript.src.replace('YOUR_GOOGLE_MAPS_API_KEY', apiKey);
-            existingScript.src = newSrc;
+        // API key varsa Google Maps'i yükle
+        if (apiKey && apiKey !== 'YOUR_API_KEY_HERE' && apiKey !== 'demo_key_or_placeholder') {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap&loading=async`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+            console.log('✅ Google Maps API script yüklendi');
+        } else {
+            console.warn('⚠️ Google Maps API key bulunamadı. Harita OpenStreetMap ile çalışacak.');
+            // Google Maps olmadan da çalışabilir, OpenStreetMap kullanılacak
         }
     } catch (error) {
-        console.error('Google Maps API key yüklenemedi:', error);
+        console.error('Google Maps API yükleme hatası:', error);
     }
 }
 
@@ -56,6 +56,50 @@ class RomanticSurprise {
         this.setupEventListeners();
         this.addRomanticEffects();
         this.loadStoredData();
+        this.setupAutoBackup();
+    }
+
+    setupAutoBackup() {
+        // Her 5 dakikada bir otomatik yedekleme (sadece veri varsa)
+        setInterval(() => {
+            if (this.targetLocation || this.videoFile || this.customPassword) {
+                this.createAutoBackup();
+            }
+        }, 5 * 60 * 1000); // 5 dakika
+        
+        // Sayfa kapatılırken otomatik yedekleme
+        window.addEventListener('beforeunload', () => {
+            if (this.targetLocation || this.videoFile || this.customPassword) {
+                this.createAutoBackup();
+            }
+        });
+    }
+
+    async createAutoBackup() {
+        try {
+            const backupData = {
+                targetLocation: this.targetLocation,
+                customPassword: this.customPassword,
+                videoFileName: this.videoFile ? this.videoFile.name : null,
+                timestamp: new Date().toISOString(),
+                version: '1.0',
+                autoBackup: true
+            };
+            
+            // Video dosyasını IndexedDB'ye kaydet
+            if (this.videoFile) {
+                await this.saveVideoToIndexedDB(this.videoFile);
+            }
+            
+            // Yedekleme verisini localStorage'a kaydet
+            localStorage.setItem('romanticSurprise', JSON.stringify(backupData));
+            localStorage.setItem('romanticSurprise_lastBackup', new Date().toISOString());
+            
+            console.log('🔄 Otomatik yedekleme tamamlandı:', new Date().toLocaleTimeString());
+            
+        } catch (error) {
+            console.error('Otomatik yedekleme hatası:', error);
+        }
     }
 
     bindEvents() {
@@ -141,9 +185,16 @@ class RomanticSurprise {
             unlockVideoBtn.addEventListener('click', () => this.unlockVideo());
         }
         
-        const sendArduinoSignalBtn = document.getElementById('send-arduino-signal');
-        if (sendArduinoSignalBtn) {
-            sendArduinoSignalBtn.addEventListener('click', () => this.sendArduinoSignal());
+        // Aşama 4
+        const backToStage3Btn = document.getElementById('back-to-stage3');
+        if (backToStage3Btn) {
+            backToStage3Btn.addEventListener('click', () => this.showPage('stage3'));
+        }
+        
+        // Aşama 5
+        const backToStage4Btn = document.getElementById('back-to-stage4');
+        if (backToStage4Btn) {
+            backToStage4Btn.addEventListener('click', () => this.showPage('stage4'));
         }
 
         // Video events
@@ -220,13 +271,37 @@ class RomanticSurprise {
                 deleteBtn.onclick = () => this.deleteData();
                 startBtn.parentNode.insertBefore(deleteBtn, startBtn.nextSibling);
             }
+            
+            // Dışa aktarım butonu ekle
+            if (!document.getElementById('export-data-btn')) {
+                const exportBtn = document.createElement('button');
+                exportBtn.id = 'export-data-btn';
+                exportBtn.className = 'btn btn-info';
+                exportBtn.innerHTML = '<i class="fas fa-download"></i> Verileri Dışa Aktar';
+                exportBtn.onclick = () => this.exportData();
+                startBtn.parentNode.insertBefore(exportBtn, startBtn.nextSibling);
+            }
+            
+            // İçe aktarım butonu ekle
+            if (!document.getElementById('import-data-btn')) {
+                const importBtn = document.createElement('button');
+                importBtn.id = 'import-data-btn';
+                importBtn.className = 'btn btn-success';
+                importBtn.innerHTML = '<i class="fas fa-upload"></i> Verileri İçe Aktar';
+                importBtn.onclick = () => this.showImportDialog();
+                startBtn.parentNode.insertBefore(importBtn, startBtn.nextSibling);
+            }
         } else {
             startBtn.innerHTML = '<i class="fas fa-play"></i> Yolculuğa Başla';
             startBtn.onclick = () => this.startJourney();
             
-            // Sil butonunu kaldır
+            // Diğer butonları kaldır
             const deleteBtn = document.getElementById('delete-data-btn');
+            const exportBtn = document.getElementById('export-data-btn');
+            const importBtn = document.getElementById('import-data-btn');
             if (deleteBtn) deleteBtn.remove();
+            if (exportBtn) exportBtn.remove();
+            if (importBtn) importBtn.remove();
         }
     }
 
@@ -243,12 +318,28 @@ class RomanticSurprise {
     async deleteData() {
         if (confirm('Tüm verileri silmek istediğinizden emin misiniz?')) {
             try {
+                const videoFileName = this.videoFile ? this.videoFile.name : null;
+                
+                // Değişkenleri temizle
                 this.targetLocation = null;
                 this.videoFile = null;
                 this.customPassword = null;
                 
-                // Dosyaları sil
+                // Server dosyalarını sil (varsa)
                 await this.deleteDataFiles();
+                
+                // IndexedDB'den video sil
+                if (videoFileName) {
+                    try {
+                        await this.deleteVideoFromIndexedDB(videoFileName);
+                        console.log('✅ Video IndexedDB\'den silindi');
+                    } catch (error) {
+                        console.warn('Video IndexedDB\'den silinemedi:', error);
+                    }
+                }
+                
+                // localStorage'ı temizle
+                localStorage.removeItem('romanticSurprise');
                 
                 // Form alanlarını temizle
                 document.getElementById('location-input').value = '';
@@ -264,7 +355,7 @@ class RomanticSurprise {
                 videoInfo.style.color = '';
                 videoInfo.style.borderLeftColor = '';
                 
-                this.showNotification('Veriler silindi!', 'success');
+                this.showNotification('Tüm veriler kalıcı olarak silindi! 🗑️', 'success');
                 this.showAdminButtons();
                 
             } catch (error) {
@@ -337,49 +428,44 @@ class RomanticSurprise {
 
     async loadStoredData() {
         try {
-            // GitHub Pages veya statik hosting kontrolü
-            const isGitHubPages = window.location.hostname.includes('github.io') || 
-                                 !window.location.hostname.includes('localhost') ||
-                                 window.location.protocol === 'file:';
+            console.log('🔄 Veri yükleme başlatılıyor...');
             
-            console.log('🔍 Hosting ortamı:', isGitHubPages ? 'GitHub Pages/Statik' : 'Node.js Server');
-            
-            if (isGitHubPages) {
-                // GitHub Pages'de direkt config.json dosyasını oku
-                console.log('📁 Config.json dosyasından yükleniyor...');
-                await this.loadFromConfigFile();
+            // 1. Önce localStorage'dan yükle (en hızlı)
+            const localStorageLoaded = await this.loadFromLocalStorage();
+            if (localStorageLoaded) {
+                console.log('✅ Veriler localStorage\'dan yüklendi');
+                this.showNotification('Veriler yerel depodan yüklendi! 💾', 'success');
             } else {
-                // Node.js server endpoint'ini dene
-                console.log('🖥️ Server endpoint\'i deneniyor...');
+                console.log('📁 LocalStorage boş, diğer yöntemler deneniyor...');
+                
+                // 2. Server endpoint'ini dene
                 try {
                     const response = await fetch('/load-data');
                     if (response.ok) {
                         const data = await response.json();
-                        this.targetLocation = data.targetLocation;
-                        this.customPassword = data.customPassword;
-                        
-                        // Video dosyasını yükle
-                        if (data.videoFileName) {
-                            const videoResponse = await fetch(`/data/${data.videoFileName}`);
-                            if (videoResponse.ok) {
-                                const videoBlob = await videoResponse.blob();
-                                this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
-                            }
-                        }
-                        
-                        this.showNotification('Veriler dosya sisteminden yüklendi!', 'success');
+                        await this.loadDataFromServer(data);
+                        console.log('✅ Veriler server\'dan yüklendi');
+                        this.showNotification('Veriler sunucudan yüklendi! 🖥️', 'success');
                     } else {
                         throw new Error('Server endpoint bulunamadı');
                     }
                 } catch (serverError) {
                     console.log('⚠️ Server endpoint başarısız, config.json deneniyor...');
-                    await this.loadFromConfigFile();
+                    
+                    // 3. Config.json dosyasını dene
+                    try {
+                        await this.loadFromConfigFile();
+                        console.log('✅ Veriler config.json\'dan yüklendi');
+                        this.showNotification('Veriler config dosyasından yüklendi! 📄', 'info');
+                    } catch (configError) {
+                        console.log('❌ Hiçbir veri kaynağı bulunamadı');
+                        this.showNotification('Henüz kaydedilmiş veri yok. Yönetici ayarlarından başlayın.', 'info');
+                    }
                 }
             }
         } catch (error) {
-            console.error('Veri yükleme hatası:', error);
-            console.log('💾 LocalStorage fallback kullanılıyor...');
-            this.loadFromLocalStorage();
+            console.error('Genel veri yükleme hatası:', error);
+            this.showNotification('Veri yükleme hatası: ' + error.message, 'error');
         }
         
         // Aşama 1'de veri kontrolü yap
@@ -387,6 +473,24 @@ class RomanticSurprise {
         
         // Yönetici veri kontrolü yap
         this.checkAdminData();
+    }
+
+    async loadDataFromServer(data) {
+        this.targetLocation = data.targetLocation;
+        this.customPassword = data.customPassword;
+        
+        // Video dosyasını yükle
+        if (data.videoFileName) {
+            try {
+                const videoResponse = await fetch(`/data/${data.videoFileName}`);
+                if (videoResponse.ok) {
+                    const videoBlob = await videoResponse.blob();
+                    this.videoFile = new File([videoBlob], data.videoFileName, { type: 'video/mp4' });
+                }
+            } catch (videoError) {
+                console.warn('Video dosyası server\'dan yüklenemedi:', videoError);
+            }
+        }
     }
 
     async loadFromConfigFile() {
@@ -423,19 +527,38 @@ class RomanticSurprise {
         }
     }
 
-    loadFromLocalStorage() {
-        const stored = localStorage.getItem('romanticSurprise');
-        if (stored) {
-            const data = JSON.parse(stored);
-            this.targetLocation = data.targetLocation;
-            this.customPassword = data.customPassword;
-            
-            // Video dosyası local storage'da saklanamaz, sadece dosya adı
-            if (data.videoFileName && data.videoFileName === 'dmask.mp4') {
-                // Proje klasöründeki dmask.mp4 dosyasını kullan
-                this.videoFile = new File([], 'dmask.mp4', { type: 'video/mp4' });
+    async loadFromLocalStorage() {
+        try {
+            const stored = localStorage.getItem('romanticSurprise');
+            if (stored) {
+                const data = JSON.parse(stored);
+                this.targetLocation = data.targetLocation;
+                this.customPassword = data.customPassword;
+                
+                // Video dosyasını IndexedDB'den yükle
+                if (data.videoFileName) {
+                    try {
+                        const videoBlob = await this.getVideoFromIndexedDB(data.videoFileName);
+                        if (videoBlob) {
+                            this.videoFile = new File([videoBlob], data.videoFileName, { type: videoBlob.type });
+                            console.log('✅ Video IndexedDB\'den yüklendi:', data.videoFileName);
+                        }
+                    } catch (error) {
+                        console.warn('Video IndexedDB\'den yüklenemedi:', error);
+                        // Fallback: proje klasöründeki dmask.mp4 dosyasını kullan
+                        if (data.videoFileName === 'dmask.mp4') {
+                            this.videoFile = new File([], 'dmask.mp4', { type: 'video/mp4' });
+                        }
+                    }
+                }
+                
+                console.log('✅ Veriler localStorage\'dan yüklendi');
+                return true;
             }
+        } catch (error) {
+            console.error('localStorage yükleme hatası:', error);
         }
+        return false;
     }
 
     checkAdminData() {
@@ -455,7 +578,7 @@ class RomanticSurprise {
 
     async saveData() {
         try {
-            // Veri klasörüne kaydet
+            // Önce server endpoint'ini dene
             const formData = new FormData();
             formData.append('targetLocation', JSON.stringify(this.targetLocation));
             formData.append('customPassword', this.customPassword);
@@ -469,22 +592,40 @@ class RomanticSurprise {
                 body: formData
             });
             
-            if (!response.ok) {
-                throw new Error('Veri kaydedilemedi');
+            if (response.ok) {
+                this.showNotification('Veriler sunucuya kaydedildi!', 'success');
+                return;
+            } else {
+                throw new Error('Server endpoint başarısız');
             }
             
-            this.showNotification('Veriler başarıyla kaydedildi!', 'success');
-            
         } catch (error) {
-            console.error('Veri kaydetme hatası:', error);
-            // Fallback olarak localStorage kullan
-            const data = {
-                targetLocation: this.targetLocation,
-                customPassword: this.customPassword,
-                videoFileName: this.videoFile ? this.videoFile.name : null
-            };
-            localStorage.setItem('romanticSurprise', JSON.stringify(data));
-            this.showNotification('Veriler local storage\'a kaydedildi (dosya sistemi hatası)', 'warning');
+            console.log('Server kaydetme başarısız, localStorage kullanılıyor...');
+            
+            // Gelişmiş localStorage + IndexedDB kaydetme
+            try {
+                const data = {
+                    targetLocation: this.targetLocation,
+                    customPassword: this.customPassword,
+                    videoFileName: this.videoFile ? this.videoFile.name : null,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Video dosyasını IndexedDB'ye kaydet
+                if (this.videoFile) {
+                    await this.saveVideoToIndexedDB(this.videoFile);
+                    console.log('✅ Video IndexedDB\'ye kaydedildi');
+                }
+                
+                // Diğer verileri localStorage'a kaydet
+                localStorage.setItem('romanticSurprise', JSON.stringify(data));
+                
+                this.showNotification('Veriler yerel olarak kaydedildi! 💾', 'success');
+                
+            } catch (localError) {
+                console.error('Yerel kaydetme hatası:', localError);
+                this.showNotification('Veri kaydetme hatası: ' + localError.message, 'error');
+            }
         }
     }
 
@@ -1405,8 +1546,12 @@ class RomanticSurprise {
         const customPassword = document.getElementById('custom-password-input').value;
 
         if (stage3Password === this.stage3Password && customPassword === this.customPassword) {
-            // Her iki şifre de doğru, videoyu aç
-            this.openVideo();
+            // Her iki şifre de doğru, video sayfasına geç
+            this.showNotification('Şifreler doğru! Video sayfasına yönlendiriliyorsunuz...', 'success');
+            setTimeout(() => {
+                this.showPage('stage4');
+                this.openVideo();
+            }, 1500);
         } else {
             this.showNotification('Şifreler yanlış!', 'error');
         }
@@ -1520,8 +1665,11 @@ class RomanticSurprise {
     // }
 
     openVideo() {
-        // Video container'ı göster
-        document.getElementById('video-container').style.display = 'block';
+        // Aşama 4'teki video container'ı göster
+        const videoContainer = document.getElementById('video-container-stage4');
+        if (videoContainer) {
+            videoContainer.style.display = 'block';
+        }
         
         // Video source'u ayarla
         const videoSource = document.getElementById('video-source');
@@ -1622,12 +1770,12 @@ class RomanticSurprise {
     // }
 
     onVideoEnded() {
-        // Video bittiğinde 4. aşamaya geç
-        this.showPage('stage4');
-        this.setupStage4();
+        // Video bittiğinde 5. aşamaya geç
+        this.showPage('stage5');
+        this.setupStage5();
     }
 
-    setupStage4() {
+    setupStage5() {
         // Final şifreyi göster
         document.getElementById('final-password-display').textContent = this.customPassword;
         
@@ -1639,8 +1787,8 @@ class RomanticSurprise {
         });
         
         // Geri butonunu ekle
-        document.getElementById('back-to-stage3').addEventListener('click', () => {
-            this.showPage('stage3');
+        document.getElementById('back-to-stage4').addEventListener('click', () => {
+            this.showPage('stage4');
         });
     }
     
@@ -1754,7 +1902,7 @@ class RomanticSurprise {
             this.showNotification('USB bağlantısı başarılı!', 'success');
             
             // Eğer video sayfasındaysak, durumu güncelle
-            if (this.currentStage === 'stage3') {
+            if (this.currentStage === 'stage4') {
                 this.updateVideoBluetoothStatus();
             }
 
@@ -1845,7 +1993,7 @@ class RomanticSurprise {
             this.showNotification('Bluetooth bağlantısı kesildi', 'info');
             
             // Eğer video sayfasındaysak, Bluetooth durumunu güncelle
-            if (this.currentStage === 'stage3') {
+            if (this.currentStage === 'stage4') {
                 this.updateVideoBluetoothStatus();
             }
         }
@@ -1868,7 +2016,7 @@ class RomanticSurprise {
                 document.getElementById('send-arduino-signal').style.display = 'none';
                 this.showNotification('USB bağlantısı kesildi', 'info');
                 
-                if (this.currentStage === 'stage3') {
+                if (this.currentStage === 'stage4') {
                     this.updateVideoBluetoothStatus();
                 }
             } catch (error) {
@@ -1906,6 +2054,12 @@ class RomanticSurprise {
             setTimeout(() => this.ensureMapResized(), 50);
             setTimeout(() => this.ensureMapResized(), 250);
             setTimeout(() => this.ensureMapResized(), 600);
+        } else if (pageName === 'stage4') {
+            // Video sayfasına geçildiğinde video container'ı göster
+            const videoContainer = document.getElementById('video-container-stage4');
+            if (videoContainer) {
+                videoContainer.style.display = 'block';
+            }
         }
     }
 
@@ -2214,6 +2368,230 @@ class RomanticSurprise {
                 }
             );
         });
+    }
+
+    // IndexedDB Video Kaydetme/Yükleme Fonksiyonları
+    async saveVideoToIndexedDB(videoFile) {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('RomanticSurpriseDB', 1);
+            
+            request.onerror = () => reject(request.error);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('videos')) {
+                    db.createObjectStore('videos', { keyPath: 'fileName' });
+                }
+            };
+            
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction(['videos'], 'readwrite');
+                const store = transaction.objectStore('videos');
+                
+                const videoData = {
+                    fileName: videoFile.name,
+                    blob: videoFile,
+                    type: videoFile.type,
+                    size: videoFile.size,
+                    timestamp: new Date().toISOString()
+                };
+                
+                const putRequest = store.put(videoData);
+                
+                putRequest.onsuccess = () => {
+                    console.log('Video IndexedDB\'ye kaydedildi:', videoFile.name);
+                    resolve();
+                };
+                
+                putRequest.onerror = () => reject(putRequest.error);
+            };
+        });
+    }
+
+    async getVideoFromIndexedDB(fileName) {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('RomanticSurpriseDB', 1);
+            
+            request.onerror = () => reject(request.error);
+            
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains('videos')) {
+                    resolve(null);
+                    return;
+                }
+                
+                const transaction = db.transaction(['videos'], 'readonly');
+                const store = transaction.objectStore('videos');
+                const getRequest = store.get(fileName);
+                
+                getRequest.onsuccess = () => {
+                    const result = getRequest.result;
+                    if (result && result.blob) {
+                        console.log('Video IndexedDB\'den yüklendi:', fileName);
+                        resolve(result.blob);
+                    } else {
+                        resolve(null);
+                    }
+                };
+                
+                getRequest.onerror = () => reject(getRequest.error);
+            };
+        });
+    }
+
+    async deleteVideoFromIndexedDB(fileName) {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('RomanticSurpriseDB', 1);
+            
+            request.onerror = () => reject(request.error);
+            
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains('videos')) {
+                    resolve();
+                    return;
+                }
+                
+                const transaction = db.transaction(['videos'], 'readwrite');
+                const store = transaction.objectStore('videos');
+                const deleteRequest = store.delete(fileName);
+                
+                deleteRequest.onsuccess = () => {
+                    console.log('Video IndexedDB\'den silindi:', fileName);
+                    resolve();
+                };
+                
+                deleteRequest.onerror = () => reject(deleteRequest.error);
+            };
+        });
+    }
+
+    // Veri Dışa/İçe Aktarım Fonksiyonları
+    async exportData() {
+        try {
+            this.showNotification('Veriler dışa aktarılıyor...', 'info');
+            
+            const exportData = {
+                targetLocation: this.targetLocation,
+                customPassword: this.customPassword,
+                videoFileName: this.videoFile ? this.videoFile.name : null,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // Video dosyasını Base64 olarak ekle
+            if (this.videoFile) {
+                const videoBase64 = await this.fileToBase64(this.videoFile);
+                exportData.videoData = videoBase64;
+                exportData.videoType = this.videoFile.type;
+                exportData.videoSize = this.videoFile.size;
+            }
+            
+            // JSON dosyası olarak indir
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `romantic-surprise-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            this.showNotification('Veriler başarıyla dışa aktarıldı! 📁', 'success');
+            
+        } catch (error) {
+            console.error('Dışa aktarım hatası:', error);
+            this.showNotification('Dışa aktarım hatası: ' + error.message, 'error');
+        }
+    }
+
+    showImportDialog() {
+        // Dosya seçim input'u oluştur
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+        
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.importData(file);
+            }
+        };
+        
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        document.body.removeChild(fileInput);
+    }
+
+    async importData(file) {
+        try {
+            this.showNotification('Veriler içe aktarılıyor...', 'info');
+            
+            const fileContent = await this.readFileAsText(file);
+            const importedData = JSON.parse(fileContent);
+            
+            // Veri formatını kontrol et
+            if (!importedData.version || !importedData.timestamp) {
+                throw new Error('Geçersiz yedekleme dosyası formatı');
+            }
+            
+            // Verileri yükle
+            this.targetLocation = importedData.targetLocation;
+            this.customPassword = importedData.customPassword;
+            
+            // Video dosyasını yükle
+            if (importedData.videoData && importedData.videoFileName) {
+                const videoBlob = this.base64ToBlob(importedData.videoData, importedData.videoType);
+                this.videoFile = new File([videoBlob], importedData.videoFileName, { 
+                    type: importedData.videoType 
+                });
+            }
+            
+            // Verileri kaydet
+            await this.saveData();
+            
+            // UI'ı güncelle
+            this.loadAdminData();
+            
+            this.showNotification(`Veriler başarıyla içe aktarıldı! 📂\nTarih: ${new Date(importedData.timestamp).toLocaleString()}`, 'success');
+            
+        } catch (error) {
+            console.error('İçe aktarım hatası:', error);
+            this.showNotification('İçe aktarım hatası: ' + error.message, 'error');
+        }
+    }
+
+    // Yardımcı fonksiyonlar
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    base64ToBlob(base64, mimeType) {
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        return new Blob([byteArray], { type: mimeType });
     }
 }
 

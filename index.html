@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💕 Romantik Sürpriz 💕</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap&loading=async" async defer></script>
+    <!-- Google Maps API Key will be loaded dynamically from environment variables -->
     <!-- Google Maps API Key will be loaded from environment variables -->
 </head>
 <body>
@@ -203,13 +204,13 @@
             </div>
         </div>
 
-        <!-- Aşama 3: Video Oynatma -->
+        <!-- Aşama 3: Şifre Girme -->
         <div id="stage3-page" class="page">
             <div class="page-content">
                 <div class="stage-header">
                     <div class="stage-number">3</div>
-                    <h2>Özel An</h2>
-                    <p>Şifreleri girerek romantik anı yaşayın</p>
+                    <h2>Şifre Doğrulama</h2>
+                    <p>Şifreleri girerek video sayfasına erişin</p>
                 </div>
                 
                 <div class="password-form">
@@ -227,20 +228,8 @@
                     </div>
                     
                     <button id="unlock-video-btn" class="btn btn-primary">
-                        <i class="fas fa-unlock"></i> Videoyu Aç
+                        <i class="fas fa-unlock"></i> Video Sayfasına Geç
                     </button>
-                </div>
-                
-                <div class="video-container" id="video-container" style="display: none;">
-                    <video id="romantic-video" controls>
-                        <source id="video-source" src="" type="video/mp4">
-                        Tarayıcınız video oynatmayı desteklemiyor.
-                    </video>
-                    <div class="video-controls">
-                        <button id="send-arduino-signal" class="btn btn-success" style="display: none;">
-                            <i class="fas fa-bluetooth"></i> Arduino'ya Sinyal Gönder
-                        </button>
-                    </div>
                 </div>
                 
                 <div class="navigation-buttons">
@@ -251,11 +240,40 @@
             </div>
         </div>
 
-        <!-- Aşama 4: Romantik Mesaj -->
+        <!-- Aşama 4: Video Oynatma -->
         <div id="stage4-page" class="page">
             <div class="page-content">
                 <div class="stage-header">
                     <div class="stage-number">4</div>
+                    <h2>Özel Video</h2>
+                    <p>Romantik anınızı yaşayın</p>
+                </div>
+                
+                <div class="video-container" id="video-container-stage4">
+                    <video id="romantic-video" controls>
+                        <source id="video-source" src="" type="video/mp4">
+                        Tarayıcınız video oynatmayı desteklemiyor.
+                    </video>
+                    <div class="video-controls">
+                        <div class="video-info">
+                            <i class="fas fa-play"></i> Video oynatılıyor...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button id="back-to-stage3" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aşama 5: Romantik Mesaj -->
+        <div id="stage5-page" class="page">
+            <div class="page-content">
+                <div class="stage-header">
+                    <div class="stage-number">5</div>
                     <h2>Romantik Sürpriz</h2>
                     <p>Video sonrası özel an</p>
                 </div>
@@ -286,6 +304,7 @@
                         <ul>
                             <li>4x4 Keypad'den <strong>1995</strong> şifresini girin</li>
                             <li><strong>#</strong> tuşu ile onaylayın</li>
+                            <li><strong>D</strong> tuşu ile kutuyu açın</li>
                             <li><strong>*</strong> tuşu ile temizleyin</li>
                             <li>Doğru şifre girildiğinde servo motor dönecek!</li>
                         </ul>
@@ -293,7 +312,7 @@
                 </div>
                 
                 <div class="navigation-buttons">
-                    <button id="back-to-stage3" class="btn btn-secondary">
+                    <button id="back-to-stage4" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Geri
                     </button>
                 </div>

@@ -46,9 +46,15 @@ app.get('/load-data', async (req, res) => {
     try {
         // Heroku'da memory'de saklanan config'i kullan
         if (global.appConfig) {
+            console.log('📤 Veri gönderiliyor:', {
+                hasLocation: !!global.appConfig.targetLocation,
+                hasPassword: !!global.appConfig.customPassword,
+                hasVideo: !!global.appConfig.videoFileName
+            });
             res.json(global.appConfig);
         } else {
-            res.status(404).json({ success: false, message: 'Veri bulunamadı' });
+            console.log('❌ Henüz kaydedilmiş veri yok');
+            res.status(404).json({ success: false, message: 'Henüz kaydedilmiş veri yok' });
         }
     } catch (error) {
         console.error('Veri yükleme hatası:', error);
