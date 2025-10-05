@@ -2655,8 +2655,30 @@ class RomanticSurprise {
     openIOSGallery(fileInput) {
         console.log('📁 Opening iOS gallery');
         
-        // Galeri için normal file input kullan
-        fileInput.click();
+        // Galeri için özel file input oluştur (capture attribute olmadan)
+        const galleryInput = document.createElement('input');
+        galleryInput.type = 'file';
+        galleryInput.accept = 'video/*';
+        galleryInput.setAttribute('multiple', 'false');
+        // capture attribute EKLEME - bu önemli!
+        galleryInput.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        `;
+        
+        galleryInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                console.log('📁 iOS gallery video selected:', e.target.files[0].name);
+                this.processSelectedFile(e.target.files[0]);
+            }
+            galleryInput.remove();
+        });
+        
+        document.body.appendChild(galleryInput);
+        galleryInput.click();
     }
     
     triggerAndroidFileSelection(fileInput) {
@@ -2817,8 +2839,29 @@ class RomanticSurprise {
     openAndroidGallery(fileInput) {
         console.log('📁 Opening Android gallery');
         
-        // Galeri için normal file input kullan
-        fileInput.click();
+        // Galeri için özel file input oluştur (capture attribute olmadan)
+        const galleryInput = document.createElement('input');
+        galleryInput.type = 'file';
+        galleryInput.accept = 'video/*';
+        // capture attribute EKLEME - bu önemli!
+        galleryInput.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        `;
+        
+        galleryInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                console.log('📁 Android gallery video selected:', e.target.files[0].name);
+                this.processSelectedFile(e.target.files[0]);
+            }
+            galleryInput.remove();
+        });
+        
+        document.body.appendChild(galleryInput);
+        galleryInput.click();
     }
     
     triggerDesktopFileSelection(fileInput) {
