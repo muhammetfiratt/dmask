@@ -2413,8 +2413,10 @@ class RomanticSurprise {
         
         // Platform-specific attributes
         if (platformInfo.isIOS) {
-            fileInput.setAttribute('capture', 'environment');
+            // iOS'ta da hem kamera hem galeri seçeneği sun
+            // capture attribute'unu kaldırarak galeri seçeneği de ekleriz
             fileInput.setAttribute('multiple', 'false');
+            console.log('🍎 iOS detected: Enabling both camera and gallery options');
         }
         
         if (platformInfo.isAndroid) {
@@ -2498,29 +2500,163 @@ class RomanticSurprise {
     triggerIOSFileSelection(fileInput) {
         console.log('📱 iOS file selection method');
         
-        // iOS için user interaction gerekli - doğrudan trigger
+        // iOS için de seçenek menüsü göster
+        this.showIOSFileOptions(fileInput);
+    }
+    
+    showIOSFileOptions(fileInput) {
+        console.log('🍎 Showing iOS file options');
+        
+        const uploadArea = document.getElementById('video-upload-area');
+        if (!uploadArea) return;
+        
+        // Önceki option menülerini temizle
+        const existingOptions = uploadArea.querySelector('.ios-options');
+        if (existingOptions) {
+            existingOptions.remove();
+        }
+        
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'ios-options';
+        optionsDiv.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 122, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        `;
+        
+        optionsDiv.innerHTML = `
+            <div style="margin-bottom: 25px;">
+                <i class="fas fa-video" style="font-size: 2.5rem; margin-bottom: 15px; display: block;"></i>
+                <h3 style="margin: 0 0 10px 0; font-size: 1.3rem;">Video Ekle</h3>
+                <p style="margin: 0; opacity: 0.9; font-size: 1rem;">Nasıl video eklemek istiyorsunuz?</p>
+            </div>
+        `;
+        
+        // Kamera butonu
+        const cameraButton = document.createElement('button');
+        cameraButton.innerHTML = '<i class="fas fa-camera"></i> Kamera ile Çek';
+        cameraButton.style.cssText = `
+            background: white;
+            color: #007AFF;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 200px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        `;
+        
+        // Galeri butonu
+        const galleryButton = document.createElement('button');
+        galleryButton.innerHTML = '<i class="fas fa-photo-video"></i> Fotoğraflardan Seç';
+        galleryButton.style.cssText = `
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 200px;
+        `;
+        
+        // Kapat butonu
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '<i class="fas fa-times"></i> İptal';
+        closeButton.style.cssText = `
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0.8;
+        `;
+        
+        // Event listeners
+        cameraButton.addEventListener('click', () => {
+            console.log('📷 iOS Camera option selected');
+            this.openIOSCamera(fileInput);
+            optionsDiv.remove();
+        });
+        
+        galleryButton.addEventListener('click', () => {
+            console.log('📁 iOS Gallery option selected');
+            this.openIOSGallery(fileInput);
+            optionsDiv.remove();
+        });
+        
+        closeButton.addEventListener('click', () => {
+            optionsDiv.remove();
+        });
+        
+        // Butonları ekle
+        optionsDiv.appendChild(cameraButton);
+        optionsDiv.appendChild(galleryButton);
+        optionsDiv.appendChild(closeButton);
+        
+        // Upload area'ya ekle
+        uploadArea.appendChild(optionsDiv);
+        
+        // 30 saniye sonra otomatik kapat
         setTimeout(() => {
-            fileInput.style.position = 'fixed';
-            fileInput.style.top = '50%';
-            fileInput.style.left = '50%';
-            fileInput.style.transform = 'translate(-50%, -50%)';
-            fileInput.style.opacity = '0.01';
-            fileInput.style.pointerEvents = 'auto';
-            fileInput.style.zIndex = '999999';
-            
-            fileInput.focus();
-            fileInput.click();
-            
-            setTimeout(() => {
-                fileInput.style.position = 'fixed';
-                fileInput.style.top = '-9999px';
-                fileInput.style.left = '-9999px';
-                fileInput.style.opacity = '0';
-                fileInput.style.pointerEvents = 'none';
-                fileInput.style.zIndex = '-1';
-                fileInput.style.transform = 'none';
-            }, 1000);
-        }, 50);
+            if (optionsDiv.parentNode) {
+                optionsDiv.remove();
+            }
+        }, 30000);
+    }
+    
+    openIOSCamera(fileInput) {
+        console.log('📷 Opening iOS camera');
+        
+        // Kamera için yeni file input oluştur
+        const cameraInput = document.createElement('input');
+        cameraInput.type = 'file';
+        cameraInput.accept = 'video/*';
+        cameraInput.setAttribute('capture', 'environment');
+        cameraInput.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        `;
+        
+        cameraInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                console.log('📹 iOS Camera video captured:', e.target.files[0].name);
+                this.processSelectedFile(e.target.files[0]);
+            }
+            cameraInput.remove();
+        });
+        
+        document.body.appendChild(cameraInput);
+        cameraInput.click();
+    }
+    
+    openIOSGallery(fileInput) {
+        console.log('📁 Opening iOS gallery');
+        
+        // Galeri için normal file input kullan
+        fileInput.click();
     }
     
     triggerAndroidFileSelection(fileInput) {
