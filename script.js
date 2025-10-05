@@ -120,11 +120,7 @@ class RomanticSurprise {
             goToAdminBtn.addEventListener('click', () => this.checkAdminPassword());
         }
         
-        // Ayarlar sayfası
-        const videoInput = document.getElementById('video-input');
-        if (videoInput) {
-            videoInput.addEventListener('change', (e) => this.handleVideoUpload(e));
-        }
+        // Ayarlar sayfası - video input event listener setupVideoDragAndDrop'ta ekleniyor
         
         const startJourneyBtn = document.getElementById('start-journey-btn');
         if (startJourneyBtn) {
@@ -652,18 +648,34 @@ class RomanticSurprise {
     handleVideoUpload(event) {
         const file = event.target.files[0];
         if (file) {
-            // Video dosya türünü kontrol et
-            if (!file.type.startsWith('video/')) {
-                this.showNotification('Lütfen geçerli bir video dosyası seçin', 'error');
+            // Mobile cihaz tespiti
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // Video dosya türünü kontrol et - mobile için daha esnek kontrol
+            const validVideoTypes = [
+                'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv',
+                'video/webm', 'video/mkv', 'video/m4v', 'video/3gp', 'video/quicktime'
+            ];
+            
+            const isValidVideo = file.type.startsWith('video/') || 
+                                validVideoTypes.includes(file.type) ||
+                                /\.(mp4|avi|mov|wmv|flv|webm|mkv|m4v|3gp)$/i.test(file.name);
+            
+            if (!isValidVideo) {
+                this.showNotification('Lütfen geçerli bir video dosyası seçin (MP4, AVI, MOV, vb.)', 'error');
                 return;
             }
             
-            // Dosya boyutunu kontrol et (100MB limit)
-            const maxSize = 100 * 1024 * 1024; // 100MB
+            // Dosya boyutunu kontrol et - mobile için daha düşük limit
+            const maxSize = isMobile ? 50 * 1024 * 1024 : 100 * 1024 * 1024; // Mobile: 50MB, Desktop: 100MB
             if (file.size > maxSize) {
-                this.showNotification('Video dosyası çok büyük. Maksimum 100MB olmalı.', 'error');
+                const maxSizeText = isMobile ? '50MB' : '100MB';
+                this.showNotification(`Video dosyası çok büyük. Maksimum ${maxSizeText} olmalı.`, 'error');
                 return;
             }
+            
+            // Loading indicator göster
+            this.showVideoUploadProgress();
             
             this.videoFile = file;
             
@@ -680,7 +692,54 @@ class RomanticSurprise {
             // Video önizleme ekle
             this.addVideoPreview(file);
             
+            // Mobile için haptic feedback
+            if (isMobile && navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
             this.showNotification('Video dosyası başarıyla yüklendi!', 'success');
+            
+            // Upload progress'i gizle
+            this.hideVideoUploadProgress();
+        }
+    }
+    
+    // Video upload progress gösterici
+    showVideoUploadProgress() {
+        const uploadArea = document.getElementById('video-upload-area');
+        if (uploadArea) {
+            const progressDiv = document.createElement('div');
+            progressDiv.id = 'upload-progress';
+            progressDiv.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                    <div class="spinner" style="margin-bottom: 10px;"></div>
+                    <p style="margin: 0; color: rgba(255, 255, 255, 0.9);">Video yükleniyor...</p>
+                </div>
+            `;
+            progressDiv.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(108, 92, 231, 0.9);
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+            `;
+            uploadArea.appendChild(progressDiv);
+        }
+    }
+    
+    // Video upload progress gizle
+    hideVideoUploadProgress() {
+        const progressDiv = document.getElementById('upload-progress');
+        if (progressDiv) {
+            setTimeout(() => {
+                progressDiv.remove();
+            }, 500);
         }
     }
 
@@ -2315,10 +2374,255 @@ class RomanticSurprise {
     }
 
     setupVideoDragAndDrop() {
-        const uploadArea = document.getElementById('video-upload-area');
-        const fileInput = document.getElementById('video-input');
+        console.log('🔧 Setting up new universal file upload system...');
         
-        // Drag & drop event listener'ları
+        const uploadArea = document.getElementById('video-upload-area');
+        if (!uploadArea) {
+            console.error('❌ Upload area not found');
+            return;
+        }
+        
+        // Platform detection
+        const userAgent = navigator.userAgent;
+        const isAndroid = /Android/i.test(userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+        const isWindows = /Windows/i.test(userAgent);
+        const isMobile = isAndroid || isIOS || /Mobile/i.test(userAgent);
+        
+        console.log('🔍 Platform detected:', { isAndroid, isIOS, isWindows, isMobile });
+        
+        // Eski file input'u kaldır
+        const oldFileInput = document.getElementById('video-input');
+        if (oldFileInput) {
+            oldFileInput.remove();
+            console.log('🗑️ Old file input removed');
+        }
+        
+        // Universal file upload handler
+        this.createUniversalFileUpload(uploadArea, { isAndroid, isIOS, isWindows, isMobile });
+    }
+    
+    createUniversalFileUpload(uploadArea, platformInfo) {
+        console.log('🚀 Creating universal file upload system');
+        
+        // Yeni file input oluştur
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = 'video-input-new';
+        fileInput.accept = 'video/*';
+        
+        // Platform-specific attributes
+        if (platformInfo.isIOS) {
+            fileInput.setAttribute('capture', 'environment');
+            fileInput.setAttribute('multiple', 'false');
+        }
+        
+        if (platformInfo.isAndroid) {
+            fileInput.setAttribute('capture', 'camcorder');
+        }
+        
+        // File input'u gizli olarak body'ye ekle
+        fileInput.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        `;
+        
+        document.body.appendChild(fileInput);
+        
+        // File change event
+        fileInput.addEventListener('change', (e) => {
+            console.log('📁 New file input changed:', e.target.files);
+            if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                console.log('📹 Processing file:', file.name, 'Size:', file.size, 'Type:', file.type);
+                this.processSelectedFile(file);
+            }
+        });
+        
+        // Upload area click handler
+        uploadArea.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🎯 Upload area clicked - Platform:', platformInfo);
+            
+            this.triggerFileSelection(fileInput, platformInfo);
+        });
+        
+        // Keyboard support
+        uploadArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                console.log('⌨️ Keyboard trigger');
+                this.triggerFileSelection(fileInput, platformInfo);
+            }
+        });
+        
+        // Drag and drop (desktop only)
+        if (!platformInfo.isMobile) {
+            this.setupDragAndDrop(uploadArea);
+        }
+        
+        // Store reference
+        this.currentFileInput = fileInput;
+        
+        console.log('✅ Universal file upload system ready');
+    }
+    
+    triggerFileSelection(fileInput, platformInfo) {
+        console.log('🎬 Triggering file selection for platform:', platformInfo);
+        
+        try {
+            if (platformInfo.isIOS) {
+                // iOS Safari özel handling
+                this.triggerIOSFileSelection(fileInput);
+            } else if (platformInfo.isAndroid) {
+                // Android özel handling  
+                this.triggerAndroidFileSelection(fileInput);
+            } else {
+                // Windows/Desktop handling
+                this.triggerDesktopFileSelection(fileInput);
+            }
+        } catch (error) {
+            console.error('❌ File selection error:', error);
+            this.showFallbackFileSelection(fileInput);
+        }
+    }
+    
+    triggerIOSFileSelection(fileInput) {
+        console.log('📱 iOS file selection method');
+        
+        // iOS için user interaction gerekli - doğrudan trigger
+        setTimeout(() => {
+            fileInput.style.position = 'fixed';
+            fileInput.style.top = '50%';
+            fileInput.style.left = '50%';
+            fileInput.style.transform = 'translate(-50%, -50%)';
+            fileInput.style.opacity = '0.01';
+            fileInput.style.pointerEvents = 'auto';
+            fileInput.style.zIndex = '999999';
+            
+            fileInput.focus();
+            fileInput.click();
+            
+            setTimeout(() => {
+                fileInput.style.position = 'fixed';
+                fileInput.style.top = '-9999px';
+                fileInput.style.left = '-9999px';
+                fileInput.style.opacity = '0';
+                fileInput.style.pointerEvents = 'none';
+                fileInput.style.zIndex = '-1';
+                fileInput.style.transform = 'none';
+            }, 1000);
+        }, 50);
+    }
+    
+    triggerAndroidFileSelection(fileInput) {
+        console.log('🤖 Android file selection method');
+        
+        // Android için basit trigger
+        fileInput.click();
+    }
+    
+    triggerDesktopFileSelection(fileInput) {
+        console.log('💻 Desktop file selection method');
+        
+        // Desktop için standard trigger
+        fileInput.click();
+    }
+    
+    showFallbackFileSelection(fileInput) {
+        console.log('🔄 Showing fallback file selection');
+        
+        // Fallback: Görünür buton göster
+        const uploadArea = document.getElementById('video-upload-area');
+        if (!uploadArea) return;
+        
+        // Önceki fallback'leri temizle
+        const existingFallback = uploadArea.querySelector('.fallback-upload');
+        if (existingFallback) {
+            existingFallback.remove();
+        }
+        
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.className = 'fallback-upload';
+        fallbackDiv.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(108, 92, 231, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        `;
+        
+        fallbackDiv.innerHTML = `
+            <i class="fas fa-upload" style="font-size: 2rem; margin-bottom: 15px;"></i>
+            <h3 style="margin: 0 0 10px 0;">Video Dosyası Seçin</h3>
+            <p style="margin: 0 0 20px 0; opacity: 0.9;">Aşağıdaki butona tıklayın</p>
+        `;
+        
+        const selectButton = document.createElement('button');
+        selectButton.textContent = 'Dosya Seç';
+        selectButton.style.cssText = `
+            background: white;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 15px;
+        `;
+        
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '<i class="fas fa-times"></i> Kapat';
+        closeButton.style.cssText = `
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        `;
+        
+        selectButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        closeButton.addEventListener('click', () => {
+            fallbackDiv.remove();
+        });
+        
+        fallbackDiv.appendChild(selectButton);
+        fallbackDiv.appendChild(closeButton);
+        uploadArea.appendChild(fallbackDiv);
+        
+        // 30 saniye sonra otomatik kapat
+        setTimeout(() => {
+            if (fallbackDiv.parentNode) {
+                fallbackDiv.remove();
+            }
+        }, 30000);
+    }
+    
+    setupDragAndDrop(uploadArea) {
+        console.log('🖱️ Setting up drag and drop for desktop');
+        
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -2336,24 +2640,53 @@ class RomanticSurprise {
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 const file = files[0];
-                if (file.type.startsWith('video/')) {
-                    // Dosya input'unu güncelle
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
-                    
-                    // Video yükleme işlemini tetikle
-                    this.handleVideoUpload({ target: { files: [file] } });
-                } else {
-                    this.showNotification('Lütfen geçerli bir video dosyası sürükleyin', 'error');
-                }
+                console.log('📂 File dropped:', file.name);
+                this.processSelectedFile(file);
             }
         });
+    }
+    
+    processSelectedFile(file) {
+        console.log('🔄 Processing selected file:', file.name);
         
-        // Tıklama ile dosya seçimi
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+        // Dosya türü kontrolü
+        const validTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm', 'video/mkv', 'video/m4v', 'video/3gp', 'video/quicktime'];
+        const isValidType = file.type.startsWith('video/') || validTypes.includes(file.type) || /\.(mp4|avi|mov|wmv|webm|mkv|m4v|3gp)$/i.test(file.name);
+        
+        if (!isValidType) {
+            this.showNotification('Lütfen geçerli bir video dosyası seçin (MP4, AVI, MOV, vb.)', 'error');
+            return;
+        }
+        
+        // Dosya boyutu kontrolü
+        const maxSize = 100 * 1024 * 1024; // 100MB
+        if (file.size > maxSize) {
+            this.showNotification('Video dosyası çok büyük. Maksimum 100MB olmalı.', 'error');
+            return;
+        }
+        
+        // Başarılı - dosyayı işle
+        this.videoFile = file;
+        this.updateVideoInfo(file);
+        this.showNotification('Video dosyası başarıyla yüklendi!', 'success');
+        
+        console.log('✅ File processed successfully:', file.name);
+    }
+    
+    updateVideoInfo(file) {
+        const videoInfo = document.getElementById('video-info');
+        if (videoInfo) {
+            videoInfo.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <strong>${file.name}</strong> başarıyla yüklendi (${this.formatFileSize(file.size)})
+            `;
+            videoInfo.style.background = 'linear-gradient(135deg, #d5f4e6, #a8e6cf)';
+            videoInfo.style.color = '#27ae60';
+            videoInfo.style.borderLeftColor = '#27ae60';
+        }
+        
+        // Video önizleme ekle
+        this.addVideoPreview(file);
     }
 
     toggleCoordinateInputs() {

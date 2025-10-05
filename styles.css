@@ -886,6 +886,31 @@ body {
     .page-content {
         padding: 15px;
     }
+    
+    /* Mobile video upload improvements */
+    .video-upload-area {
+        padding: 25px 15px;
+        min-height: 140px;
+        border-width: 3px;
+    }
+    
+    .upload-placeholder i {
+        font-size: 2.5rem !important;
+    }
+    
+    .upload-placeholder p {
+        font-size: 1rem !important;
+        margin: 15px 0 10px 0 !important;
+    }
+    
+    .upload-placeholder small {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Mobile file input improvements */
+    .video-upload-area .file-input {
+        z-index: 10;
+    }
 }
 
 /* Özel Animasyonlar */
@@ -1510,6 +1535,15 @@ body {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.05);
     overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .video-upload-area:hover {
@@ -1522,6 +1556,14 @@ body {
     border-color: #27ae60;
     background: rgba(39, 174, 96, 0.1);
     transform: scale(1.02);
+}
+
+/* Mobile touch states */
+.video-upload-area.touch-active {
+    border-color: #6c5ce7;
+    background: rgba(108, 92, 231, 0.15);
+    transform: scale(0.98);
+    box-shadow: inset 0 4px 8px rgba(108, 92, 231, 0.2);
 }
 
 .upload-placeholder {
@@ -1553,6 +1595,8 @@ body {
     height: 100%;
     opacity: 0;
     cursor: pointer;
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Video Önizleme */

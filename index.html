@@ -62,13 +62,13 @@
                         <label for="video-input">
                             <i class="fas fa-video"></i> Video Dosyası
                         </label>
-                        <div class="video-upload-area" id="video-upload-area">
+                        <div class="video-upload-area" id="video-upload-area" role="button" tabindex="0" aria-label="Video dosyası yüklemek için tıklayın">
                             <div class="upload-placeholder">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Video dosyasını buraya sürükleyin veya tıklayın</p>
-                                <small>MP4, AVI, MOV desteklenir (Maks. 100MB)</small>
+                                <p id="upload-text">Video dosyasını buraya sürükleyin veya tıklayın</p>
+                                <small id="upload-hint">MP4, AVI, MOV desteklenir (Maks. 100MB)</small>
                             </div>
-                            <input type="file" id="video-input" accept="video/*" class="file-input">
+                            <!-- File input will be created dynamically by JavaScript -->
                         </div>
                         <div class="video-info" id="video-info">
                             <i class="fas fa-info-circle"></i>
