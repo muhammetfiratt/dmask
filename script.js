@@ -2418,7 +2418,9 @@ class RomanticSurprise {
         }
         
         if (platformInfo.isAndroid) {
-            fileInput.setAttribute('capture', 'camcorder');
+            // Android'de hem kamera hem galeri seçeneği sun
+            // capture attribute'unu kaldırarak galeri seçeneği de ekleriz
+            console.log('🤖 Android detected: Enabling both camera and gallery options');
         }
         
         // File input'u gizli olarak body'ye ekle
@@ -2524,7 +2526,162 @@ class RomanticSurprise {
     triggerAndroidFileSelection(fileInput) {
         console.log('🤖 Android file selection method');
         
-        // Android için basit trigger
+        // Android için seçenek menüsü göster
+        this.showAndroidFileOptions(fileInput);
+    }
+    
+    showAndroidFileOptions(fileInput) {
+        console.log('📱 Showing Android file options');
+        
+        const uploadArea = document.getElementById('video-upload-area');
+        if (!uploadArea) return;
+        
+        // Önceki option menülerini temizle
+        const existingOptions = uploadArea.querySelector('.android-options');
+        if (existingOptions) {
+            existingOptions.remove();
+        }
+        
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'android-options';
+        optionsDiv.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(76, 175, 80, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        `;
+        
+        optionsDiv.innerHTML = `
+            <div style="margin-bottom: 25px;">
+                <i class="fas fa-video" style="font-size: 2.5rem; margin-bottom: 15px; display: block;"></i>
+                <h3 style="margin: 0 0 10px 0; font-size: 1.3rem;">Video Seçin</h3>
+                <p style="margin: 0; opacity: 0.9; font-size: 1rem;">Nasıl video eklemek istiyorsunuz?</p>
+            </div>
+        `;
+        
+        // Kamera butonu
+        const cameraButton = document.createElement('button');
+        cameraButton.innerHTML = '<i class="fas fa-camera"></i> Kamera ile Çek';
+        cameraButton.style.cssText = `
+            background: white;
+            color: #4CAF50;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 200px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        `;
+        
+        // Galeri butonu
+        const galleryButton = document.createElement('button');
+        galleryButton.innerHTML = '<i class="fas fa-folder"></i> Galeriden Seç';
+        galleryButton.style.cssText = `
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 200px;
+        `;
+        
+        // Kapat butonu
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '<i class="fas fa-times"></i> İptal';
+        closeButton.style.cssText = `
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0.8;
+        `;
+        
+        // Event listeners
+        cameraButton.addEventListener('click', () => {
+            console.log('📷 Camera option selected');
+            this.openAndroidCamera(fileInput);
+            optionsDiv.remove();
+        });
+        
+        galleryButton.addEventListener('click', () => {
+            console.log('📁 Gallery option selected');
+            this.openAndroidGallery(fileInput);
+            optionsDiv.remove();
+        });
+        
+        closeButton.addEventListener('click', () => {
+            optionsDiv.remove();
+        });
+        
+        // Butonları ekle
+        optionsDiv.appendChild(cameraButton);
+        optionsDiv.appendChild(galleryButton);
+        optionsDiv.appendChild(closeButton);
+        
+        // Upload area'ya ekle
+        uploadArea.appendChild(optionsDiv);
+        
+        // 30 saniye sonra otomatik kapat
+        setTimeout(() => {
+            if (optionsDiv.parentNode) {
+                optionsDiv.remove();
+            }
+        }, 30000);
+    }
+    
+    openAndroidCamera(fileInput) {
+        console.log('📷 Opening Android camera');
+        
+        // Kamera için yeni file input oluştur
+        const cameraInput = document.createElement('input');
+        cameraInput.type = 'file';
+        cameraInput.accept = 'video/*';
+        cameraInput.setAttribute('capture', 'camcorder');
+        cameraInput.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        `;
+        
+        cameraInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                console.log('📹 Camera video captured:', e.target.files[0].name);
+                this.processSelectedFile(e.target.files[0]);
+            }
+            cameraInput.remove();
+        });
+        
+        document.body.appendChild(cameraInput);
+        cameraInput.click();
+    }
+    
+    openAndroidGallery(fileInput) {
+        console.log('📁 Opening Android gallery');
+        
+        // Galeri için normal file input kullan
         fileInput.click();
     }
     
